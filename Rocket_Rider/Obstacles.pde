@@ -34,9 +34,7 @@ class Obstacles
   void show()
    {
    //fill(105, 105, 105);
-   noStroke();
-   
-   
+     noStroke();
     image(asteroid, x, y,28,28);
 
 

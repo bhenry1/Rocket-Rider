@@ -4,6 +4,8 @@ PImage asteroid;
 PImage medAsteroid;
 PFont font;
 PImage spaceBackGround;
+PImage rocketFrontImage;
+PImage rocketRearImage; 
 
 
 Rocket myRocket;
@@ -24,6 +26,8 @@ MObstacles[] mObstacles = new MObstacles[1];
 float speed;
 float timeInterval;
 float timePast;
+float timePast2;
+float levelTimer = 15000;
 int keyInput;
 
 float scoreInterval = 500;
@@ -40,9 +44,13 @@ CollisionField testBox;
 void setup()
 {
   size(600, 600);
+  rocketFrontImage = loadImage("RocketFront.png");
+  rocketRearImage = loadImage("RocketRear.png");
+
   testBox = new CollisionField(new PVector(100,100),new PVector(width/4,100));
   font = loadFont("Stencil-48.vlw");
   timePast = millis();
+  timePast2 = millis();
   timeInterval = 750.0f;
   keyInput = 0;
     int size1 = 30;
@@ -50,13 +58,13 @@ void setup()
   
   //Front rocket parameters: Defense , Size
   
-   front_HollowPoint = new RocketFront(1,new PVector(size1,size1));
-   front_TankPoint = new RocketFront(5,new PVector(size1,size1));
+   front_HollowPoint = new RocketFront(1,new PVector(size1,size1), rocketFrontImage);
+   front_TankPoint = new RocketFront(5,new PVector(size1,size1), rocketFrontImage);
    //Rear Rocket parameters: ThrustSpeed, SpeedLimit , Size
    
-   rear_BoomBoom = new RocketRear(10,1,new PVector(size2,size2));
-   rear_PuffPuff = new RocketRear(5,10,new PVector(size2,size2));
-   rear_StagStag = new RocketRear(5,5,new PVector(size2,size2));
+   rear_BoomBoom = new RocketRear(10,1,new PVector(size2,size2), rocketRearImage);
+   rear_PuffPuff = new RocketRear(5,10,new PVector(size2,size2), rocketRearImage);
+   rear_StagStag = new RocketRear(5,5,new PVector(size2,size2), rocketRearImage);
    //ROCKET IS BUILT
    myRocket = new Rocket(width/2,height/4,front_HollowPoint,rear_StagStag);
   
@@ -136,6 +144,14 @@ void draw()
     text("Score:" + score , 0, 30); 
     textSize(22);
     fill(255,255,255,255);
+    
+    if(millis() > timePast2 + levelTimer)
+    {
+      timePast2 += millis();
+      level++;
+      
+    }
+    
     text("Level: " + level, 0, 50);
     
       for(int i = 0; i < obstacles.length; i++)
