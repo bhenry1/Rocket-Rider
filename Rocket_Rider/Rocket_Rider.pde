@@ -63,7 +63,7 @@ void setup()
   asteroid = loadImage("smallAstro.png");
   medAsteroid = loadImage("MedAstro.png");
   spaceBackGround = loadImage("Space.png");
-  spaceBackGround.resize(600, 600);
+  //spaceBackGround.resize(600, 600);
   
   
   
@@ -122,7 +122,8 @@ void draw()
     }
     
  
-    background(spaceBackGround);
+    //background(spaceBackGround);
+    image(spaceBackGround,0,0);
     textSize(22);
     fill(255,255,255,255);
    
@@ -152,11 +153,9 @@ void draw()
       } 
       myRocket.move();
       myRocket.display();
-      testBox.display(new PVector(width/2,100));
-      if(testBox.isCollidingWith(myRocket.box))
-      {
-       print("WE HIT"); 
-      }
+      //testBox.display(new PVector(width/2,100));
+      //if(testBox.isCollidingWith(myRocket.box))
+     
       
     
       

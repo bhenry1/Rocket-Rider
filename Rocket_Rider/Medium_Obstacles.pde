@@ -33,7 +33,7 @@ class MObstacles
    //fill(105, 105, 105);
    noStroke();
    
-    image(medAsteroid, x1, y1,35,35);
+    image(medAsteroid, x1, y1,75,75);
 
 
     

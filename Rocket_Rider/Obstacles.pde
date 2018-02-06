@@ -5,7 +5,8 @@ class Obstacles
   float x;
   float y;
   float z;
-  
+  PVector pos;
+  CollisionField box;
   float speed = 3;
   
   
@@ -13,9 +14,9 @@ class Obstacles
   {
     x = random(-width, width);
     y = random(-height, height); 
-   
-    
-    
+    pos = new PVector(x,y);
+    box = new CollisionField(new PVector(50,50),pos);
+
   }
   
   
@@ -27,33 +28,30 @@ class Obstacles
       timePassed += millis();
       speed++;
     }
-    y = y - speed;
+    pos.y = pos.y - speed;
   }
   
   
   void show()
    {
-   //fill(105, 105, 105);
+     
    noStroke();
    
    
-    image(asteroid, x, y,28,28);
+    imageMode(CENTER);
+    image(asteroid, pos.x, pos.y,50,50);
+    imageMode(CORNER);
 
 
     //ellipse(x, y, 10, 10);
     
-    if(y <0)
+    if(pos.y <0)
     {
-    x = random(width);
-    y = random(height,height*2); 
-  
-      
+    pos.x = random(width);
+    pos.y = random(height,height*2);       
     }
-    
-      
-    
-    
- 
+  
+    box.display(pos);
    
    }
   
