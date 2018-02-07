@@ -1,5 +1,6 @@
 import processing.sound.*;
 SoundFile musicFile;
+
 PImage asteroid;
 PImage medAsteroid;
 PFont font;
@@ -7,12 +8,10 @@ PImage spaceBackGround;
 PImage rocketFrontImage;
 PImage rocketRearImage; 
 
-
 Rocket myRocket;
 RocketFront front;
 RocketFront front_HollowPoint;
 RocketFront front_TankPoint;
-
 
 RocketRear rear;
 RocketRear rear_BoomBoom;
@@ -27,6 +26,7 @@ float speed;
 float timeInterval;
 float timePast;
 float timePast2;
+float timePast3;
 float levelTimer = 15000;
 int keyInput;
 
@@ -51,22 +51,23 @@ void setup()
   font = loadFont("Stencil-48.vlw");
   timePast = millis();
   timePast2 = millis();
+  timePast3 = millis();
   timeInterval = 750.0f;
   keyInput = 0;
-    int size1 = 30;
-   int size2= 30;
+  int size1 = 30;
+  int size2= 30;
   
   //Front rocket parameters: Defense , Size
   
-   front_HollowPoint = new RocketFront(1,new PVector(size1,size1), rocketFrontImage);
-   front_TankPoint = new RocketFront(5,new PVector(size1,size1), rocketFrontImage);
-   //Rear Rocket parameters: ThrustSpeed, SpeedLimit , Size
+  front_HollowPoint = new RocketFront(1,new PVector(size1,size1), rocketFrontImage);
+  front_TankPoint = new RocketFront(5,new PVector(size1,size1), rocketFrontImage);
+  //Rear Rocket parameters: ThrustSpeed, SpeedLimit , Size
    
-   rear_BoomBoom = new RocketRear(10,1,new PVector(size2,size2), rocketRearImage);
-   rear_PuffPuff = new RocketRear(5,10,new PVector(size2,size2), rocketRearImage);
-   rear_StagStag = new RocketRear(5,5,new PVector(size2,size2), rocketRearImage);
-   //ROCKET IS BUILT
-   myRocket = new Rocket(width/2,height/4,front_HollowPoint,rear_StagStag);
+  rear_BoomBoom = new RocketRear(10,1,new PVector(size2,size2), rocketRearImage);
+  rear_PuffPuff = new RocketRear(5,10,new PVector(size2,size2), rocketRearImage);
+  rear_StagStag = new RocketRear(5,5,new PVector(size2,size2), rocketRearImage);
+  //ROCKET IS BUILT
+  myRocket = new Rocket(width/2,height/4,front_HollowPoint,rear_StagStag);
   
   asteroid = loadImage("smallAstro.png");
   medAsteroid = loadImage("MedAstro.png");
@@ -82,7 +83,7 @@ void setup()
   
   for(int i = 0; i < obstacles.length; i++)
   {
-        obstacles[i] = new Obstacles();
+        obstacles[i] = new Obstacles(timePast3);
 
   }
   
@@ -172,11 +173,7 @@ void draw()
       if(testBox.isCollidingWith(myRocket.box))
       {
        print("WE HIT"); 
-      }
-      
-    
-      
-      
+      } 
   }
   
   //Stage 3
@@ -190,27 +187,10 @@ void draw()
     textSize(22);
     fill(255);
    
-    text("Press e to play again" , 200, 400); 
-    
-    
-    if(key == 'e')
-    {
-       stage = 1; 
-      
-    }
+    text("Press the spacebar to play again" , 120, 400);  
    
-   
-   
-   
-  
-    
-    
-    
-    
   }
-  
-  
-  
+
 }
 
 void getInput()
@@ -221,21 +201,33 @@ void getInput()
     {
     //println(keyCode);
     if(keyInput == RIGHT)
-    {
-      myRocket.moveRight();
-    }
+    myRocket.moveRight();
+    
     else if(keyInput == LEFT)
-    {
-      myRocket.moveLeft();
-    }
-  }  
+    myRocket.moveLeft();
+    
+    }  
  }
- else
-  if(keyPressed || mousePressed)
+ else if(stage == 1)
+ {
+  if(key == 10)
      {
        musicFile.stop();
        stage = 2;
      }
+ }
+     
+ else
+ {
+   //sapcebar
+   if(key== 32)
+     {
+       score = 0;
+       level = 1;
+       stage = 1;
+       timePast3 = 0;
+     }
+ }
  
 }
 void keyPressed()
@@ -257,7 +249,7 @@ void setText()
  text("Rocket Rider!", -100, -250);
  fill(255,255,255,textOpacity);
  rectMode(CENTER);
- text("Press any button to begin", -width/2.6667, 0);
+ text("Press enter to ride!", -width/3.5, 0);
 }
 
 void textFade()

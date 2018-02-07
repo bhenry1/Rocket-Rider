@@ -1,6 +1,6 @@
 class Obstacles
 {
-  float timePassed = 0;
+  float timePassed;
   float levelTimer = 15000;
   float x;
   float y;
@@ -9,10 +9,11 @@ class Obstacles
   float speed = 3;
   
   
-  Obstacles()
+  Obstacles(float timePassed)
   {
     x = random(-width, width);
     y = random(-height, height); 
+    this.timePassed = timePassed;
    
     
     
@@ -35,7 +36,7 @@ class Obstacles
    {
    //fill(105, 105, 105);
      noStroke();
-    image(asteroid, x, y,28,28);
+    image(asteroid, x, y,75,75);
 
 
     //ellipse(x, y, 10, 10);
@@ -44,14 +45,7 @@ class Obstacles
     {
     x = random(width);
     y = random(height,height*2); 
-  
-      
     }
-    
-      
-    
-    
- 
    
    }
   
