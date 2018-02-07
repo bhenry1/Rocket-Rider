@@ -69,7 +69,7 @@ class Rocket
     fill(255);
     box.display(pos);
     ellipseMode(CENTER);
-    front.setPosition(pos.x,pos.y+15);
+    front.setPosition(pos.x,pos.y);
     rear.setPosition(pos.x,pos.y-15);
     front.display();
     rear.display();

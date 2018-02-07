@@ -15,7 +15,7 @@ class Obstacles
     x = random(-width, width);
     y = random(-height, height); 
     pos = new PVector(x,y);
-    box = new CollisionField(new PVector(50,50),pos);
+    box = new CollisionField(new PVector(40,40),pos);
 
   }
   
@@ -40,8 +40,7 @@ class Obstacles
    
     imageMode(CENTER);
     image(asteroid, pos.x, pos.y,50,50);
-    imageMode(CORNER);
-
+    
 
     //ellipse(x, y, 10, 10);
     
