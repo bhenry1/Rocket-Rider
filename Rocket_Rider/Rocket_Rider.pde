@@ -1,5 +1,8 @@
 import processing.sound.*;
+
 SoundFile musicFile;
+SoundFile stage2MusicFile;
+SoundFile crashSound;
 
 PImage asteroid;
 PImage medAsteroid;
@@ -7,6 +10,8 @@ PFont font;
 PImage spaceBackGround;
 PImage rocketFrontImage;
 PImage rocketRearImage; 
+
+boolean gameover;
 
 Rocket myRocket;
 RocketFront front;
@@ -50,6 +55,7 @@ CollisionField testBox;
 
 void setup()
 {
+  gameover = false;
   size(600, 600);
   rocketFrontImage = loadImage("RocketFront.png");
   rocketRearImage = loadImage("RocketRear.png");
@@ -92,18 +98,26 @@ void setup()
   for(int i = 0; i < obstacles.length; i++)
   {
         obstacles[i] = new Obstacles(timePast3);
+        obstacles[i].resetObstaclePostion();
 
   }
   
   for(int i = 0; i < mObstacles.length; i++)
   {
         mObstacles[i] = new MObstacles();
+        mObstacles[i].resetObstaclePostion();
 
   }
   
   musicFile = new SoundFile(this, "StartMusic.mp3");
   musicFile.play();
   musicFile.amp(0.3);
+  
+  stage2MusicFile = new SoundFile(this, "DiamondInTheSky.mp3");
+  stage2MusicFile.amp(0.3);
+  
+  crashSound = new SoundFile(this, "Crash.mp3");
+  crashSound.amp(0.6);
   frameRate(30);
   
 }
@@ -166,8 +180,9 @@ void draw()
         if(obstacles[i].box.isCollidingWith(myRocket.box))
         {
           obj.resetObstaclePostion();
-
-         stage = 3;
+          
+          gameover = true;
+         //stage = 3;
          
 
         }
@@ -179,18 +194,19 @@ void draw()
         mObstacles[i].show();
         if(mObstacles[i].box.isCollidingWith(myRocket.box))
         {
-          stage = 3;
+          gameover = true;
+          //stage = 3;
           
         }
       } 
       myRocket.move();
       myRocket.display();
-
   }
   
   //Stage 3
   else if(stage == 3)
   {
+    stage2MusicFile.stop();
     background(0);
     fill(255);
     textSize(22);
@@ -202,6 +218,24 @@ void draw()
     text("Press the spacebar to play again" , 120, 400);  
    
   }
+  
+   if(gameover)
+      {
+        
+        crashSound.play();
+
+         for(int i = 0; i < mObstacles.length; i++)
+         {
+           mObstacles[i].resetObstaclePostion();
+         }
+          for(int i = 0; i < obstacles.length; i++)
+         {
+           obstacles[i].resetObstaclePostion();
+         }
+         stage = 3;
+        gameover = false;
+      }
+
 
 }
 
@@ -222,10 +256,12 @@ void getInput()
  }
  else if(stage == 1)
  {
-   //enter
-  if(key == 10)
+
+   //Enter
+  if(key==10)
      {
        musicFile.stop();
+       stage2MusicFile.play();
        stage = 2;
      }
  }
@@ -235,6 +271,8 @@ void getInput()
    //sapcebar
    if(key== 32)
      {
+       crashSound.stop();
+       musicFile.play();
        score = 0;
        level = 1;
        stage = 1;
