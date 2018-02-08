@@ -29,6 +29,10 @@ float timePast2;
 float timePast3;
 float levelTimer = 15000;
 int keyInput;
+//Astroid Postions
+float x;
+float y;
+
 
 float scoreInterval = 500;
 
@@ -38,6 +42,9 @@ int textOpacity = 100;
 int textFade = 2;
 int score = 0;
 int level = 1;
+Obstacles obj = new Obstacles(timePast3);
+MObstacles Mobj = new MObstacles();
+
 
 CollisionField testBox;
 
@@ -63,16 +70,17 @@ void setup()
   front_TankPoint = new RocketFront(5,new PVector(size1,size1), rocketFrontImage);
   //Rear Rocket parameters: ThrustSpeed, SpeedLimit , Size
    
-  rear_BoomBoom = new RocketRear(10,1,new PVector(size2,size2), rocketRearImage);
-  rear_PuffPuff = new RocketRear(5,10,new PVector(size2,size2), rocketRearImage);
-  rear_StagStag = new RocketRear(5,5,new PVector(size2,size2), rocketRearImage);
-  //ROCKET IS BUILT
-  myRocket = new Rocket(width/2,height/4,front_HollowPoint,rear_StagStag);
+
+   rear_BoomBoom = new RocketRear(30,1,new PVector(size2,size2), rocketRearImage);
+   rear_PuffPuff = new RocketRear(1,30,new PVector(size2,size2), rocketRearImage);
+   rear_StagStag = new RocketRear(10,10,new PVector(size2,size2), rocketRearImage);
+   //ROCKET IS BUILT
+   myRocket = new Rocket(width/2,height/4,front_TankPoint,rear_BoomBoom);
   
   asteroid = loadImage("smallAstro.png");
   medAsteroid = loadImage("MedAstro.png");
   spaceBackGround = loadImage("Space.png");
-  spaceBackGround.resize(600, 600);
+  //spaceBackGround.resize(600, 600);
   
   
   
@@ -124,14 +132,9 @@ void draw()
    //Stage 2
    else if(stage == 2)
   {
-    
-    if(key == 'q')
-    {
-       stage = 3; 
-    }
-    
- 
-    background(spaceBackGround);
+    //background(spaceBackGround);
+    imageMode(CORNER);
+    image(spaceBackGround,0,0);
     textSize(22);
     fill(255,255,255,255);
    
@@ -160,20 +163,29 @@ void draw()
         
         obstacles[i].update();
         obstacles[i].show();
+        if(obstacles[i].box.isCollidingWith(myRocket.box))
+        {
+          obj.resetObstaclePostion();
+
+         stage = 3;
+         
+
+        }
       }
       
       for(int i = 0; i < mObstacles.length; i++)
       {
         mObstacles[i].update();
         mObstacles[i].show();
+        if(mObstacles[i].box.isCollidingWith(myRocket.box))
+        {
+          stage = 3;
+          
+        }
       } 
       myRocket.move();
       myRocket.display();
-      testBox.display(new PVector(width/2,100));
-      if(testBox.isCollidingWith(myRocket.box))
-      {
-       print("WE HIT"); 
-      } 
+
   }
   
   //Stage 3
