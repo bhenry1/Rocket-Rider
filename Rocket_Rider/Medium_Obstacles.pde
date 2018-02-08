@@ -7,7 +7,7 @@ class MObstacles
   float z1;
   PVector pos;
   CollisionField box;
-  float speed = 5;
+  float speed = 8;
   
   
   
@@ -52,13 +52,12 @@ class MObstacles
    
    }
    
-      void resetObstaclePostion()
-{
-    System.out.println("Hello");
+ void resetObstaclePostion()
+  {
     pos.x = random(-width, -width);
     pos.y = random(-height, -height); 
-    pos = new PVector(x,y);
-    box = new CollisionField(new PVector(40,40),pos);
-}
+    //pos = new PVector(x,y);
+    //box = new CollisionField(new PVector(40,40),pos);
+  }
   
 }

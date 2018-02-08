@@ -8,6 +8,8 @@ PImage spaceBackGround;
 PImage rocketFrontImage;
 PImage rocketRearImage; 
 
+boolean gameover;
+
 Rocket myRocket;
 RocketFront front;
 RocketFront front_HollowPoint;
@@ -50,6 +52,7 @@ CollisionField testBox;
 
 void setup()
 {
+  gameover = false;
   size(600, 600);
   rocketFrontImage = loadImage("RocketFront.png");
   rocketRearImage = loadImage("RocketRear.png");
@@ -92,12 +95,14 @@ void setup()
   for(int i = 0; i < obstacles.length; i++)
   {
         obstacles[i] = new Obstacles(timePast3);
+        obstacles[i].resetObstaclePostion();
 
   }
   
   for(int i = 0; i < mObstacles.length; i++)
   {
         mObstacles[i] = new MObstacles();
+        mObstacles[i].resetObstaclePostion();
 
   }
   
@@ -166,8 +171,9 @@ void draw()
         if(obstacles[i].box.isCollidingWith(myRocket.box))
         {
           obj.resetObstaclePostion();
-
-         stage = 3;
+          
+          gameover = true;
+         //stage = 3;
          
 
         }
@@ -179,13 +185,13 @@ void draw()
         mObstacles[i].show();
         if(mObstacles[i].box.isCollidingWith(myRocket.box))
         {
-          stage = 3;
+          gameover = true;
+          //stage = 3;
           
         }
       } 
       myRocket.move();
       myRocket.display();
-
   }
   
   //Stage 3
@@ -202,6 +208,21 @@ void draw()
     text("Press the spacebar to play again" , 120, 400);  
    
   }
+  
+   if(gameover)
+      {
+         for(int i = 0; i < mObstacles.length; i++)
+         {
+           mObstacles[i].resetObstaclePostion();
+         }
+          for(int i = 0; i < obstacles.length; i++)
+         {
+           obstacles[i].resetObstaclePostion();
+         }
+         stage = 3;
+        gameover = false;
+      }
+
 
 }
 
@@ -222,7 +243,7 @@ void getInput()
  }
  else if(stage == 1)
  {
-  if(key == 10)
+  if(key==10)
      {
        musicFile.stop();
        stage = 2;

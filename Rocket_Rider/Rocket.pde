@@ -25,7 +25,7 @@ class Rocket
     this.mass = 1;//front.mass+rear.mass;
     this.speed = 1+(this.rear.thrustSpeed/this.front.defense);
     this.limit = 5+ this.rear.speedLimit;
-    box = new CollisionField(new PVector(30,60),this.pos);
+    box = new CollisionField(new PVector(10,60),this.pos);
   }
   
   void move()
@@ -67,9 +67,9 @@ class Rocket
   void display()
   {
     fill(255);
-    box.display(pos);
-    ellipseMode(CENTER);
-    front.setPosition(pos.x,pos.y);
+   
+   
+    front.setPosition(pos.x,pos.y+10);
     rear.setPosition(pos.x,pos.y-15);
     front.display();
     rear.display();
@@ -82,6 +82,7 @@ class Rocket
     {
       pos.x = 0;
     }
+    box.display(pos);
   }
   
   void moveLeft()
