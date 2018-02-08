@@ -222,6 +222,7 @@ void getInput()
  }
  else if(stage == 1)
  {
+   //enter
   if(key == 10)
      {
        musicFile.stop();
