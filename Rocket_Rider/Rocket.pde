@@ -22,8 +22,8 @@ class Rocket
     this.velocity = new PVector(0,0);
     this.direction = new PVector(0,0);
     
-    this.mass = 1;//front.mass+rear.mass;
-    this.speed = 1+(this.rear.thrustSpeed/this.front.defense);
+    this.mass = this.front.defense;
+    this.speed = 1+(this.rear.thrustSpeed);
     this.limit = 5+ this.rear.speedLimit;
     box = new CollisionField(new PVector(10,60),this.pos);
   }

@@ -74,14 +74,13 @@ void setup()
   
   front_HollowPoint = new RocketFront(1,new PVector(size1,size1), rocketFrontImage);
   front_TankPoint = new RocketFront(5,new PVector(size1,size1), rocketFrontImage);
+  
   //Rear Rocket parameters: ThrustSpeed, SpeedLimit , Size
-   
-
-   rear_BoomBoom = new RocketRear(30,1,new PVector(size2,size2), rocketRearImage);
-   rear_PuffPuff = new RocketRear(1,30,new PVector(size2,size2), rocketRearImage);
+   rear_BoomBoom = new RocketRear(20,1,new PVector(size2,size2), rocketRearImage);
+   rear_PuffPuff = new RocketRear(2,10,new PVector(size2,size2), rocketRearImage);
    rear_StagStag = new RocketRear(10,10,new PVector(size2,size2), rocketRearImage);
    //ROCKET IS BUILT
-   myRocket = new Rocket(width/2,height/4,front_TankPoint,rear_BoomBoom);
+   myRocket = new Rocket(width/2,height/4,front_HollowPoint,rear_PuffPuff);
   
   asteroid = loadImage("smallAstro.png");
   medAsteroid = loadImage("MedAstro.png");
@@ -312,5 +311,9 @@ void textFade()
   }
   
   textOpacity += textFade;
+}
+
+scrollCamera()
+{
   
 }
