@@ -313,7 +313,7 @@ void textFade()
   textOpacity += textFade;
 }
 
-scrollCamera()
+void scrollCamera()
 {
   
 }
