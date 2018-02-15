@@ -84,7 +84,7 @@ void setup()
   
   asteroid = loadImage("smallAstro.png");
   medAsteroid = loadImage("MedAstro.png");
-  spaceBackGround = loadImage("Space.png");
+  spaceBackGround = loadImage("SpaceBackground2.png");
   //spaceBackGround.resize(600, 600);
   
   
@@ -128,7 +128,8 @@ void draw()
   if(stage == 1)
   {
    translate(width/2, height/2);
-   speed = map(mouseX, 0, width, 1, 15);
+   //speed = map(mouseX, 0, width, 1, 15);
+   speed = 20;
    background(0);
    textFade();
    
