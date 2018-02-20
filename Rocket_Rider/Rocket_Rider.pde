@@ -377,7 +377,10 @@ void candyCollisionLogic()
         candies[i].show();
         if(candies[i].box.isCollidingWith(myRocket.box))
         {
-          candy++;  
+          candy++;
+         candies[i].resetCandyPostion();
+            
+          
         }
         
       }
@@ -421,11 +424,13 @@ void resetCandyAndObstaclePostions()
    {
    obstacles[i].resetObstaclePostion();
    }
-         
+    
+    /*
    for(int i = 0; i < candies.length; i++)
    {
    candies[i].resetCandyPostion();
    }
+   */
   
 }
 

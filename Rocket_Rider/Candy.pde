@@ -7,7 +7,7 @@ class Candy
   float y2;
   PVector pos;
   CollisionField box;
-  float speed = 1;
+  float speed = 3;
   
   
   
