@@ -23,11 +23,13 @@ class Candy
   
   void update()
   {
+    /*
     if(millis() > timePassed + levelTimer)
     {
       timePassed = millis();
       speed++;
     }
+    */
     pos.y = pos.y - speed;
   }
   

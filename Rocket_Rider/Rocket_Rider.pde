@@ -3,6 +3,7 @@ import processing.sound.*;
 SoundFile musicFile;
 SoundFile stage2MusicFile;
 SoundFile crashSound;
+SoundFile candyCollect;
 
 PImage asteroid;
 PImage medAsteroid;
@@ -12,6 +13,7 @@ PImage rocketFrontImage;
 PImage rocketRearImage; 
 PImage gameOverBackGround;
 PImage milkyWayCandyCollectable;
+PImage titleScreenBackground;
 
 boolean gameover;
 boolean visible = false;
@@ -36,31 +38,40 @@ float timeInterval;
 float timePast;
 float timePast2;
 float timePast3;
+float timer4;
+
 float levelTimer = 15000;
 int keyInput;
 //Astroid Postions
 float x;
 float y;
 
+
 //score increses every half a second
 float scoreInterval = 500;
 
-
+float timeAlive = 0;
 int stage = 1;
 int textOpacity = 100;
 int textFade = 2;
 int score = 0;
+int scoreMultiplyer = 10;
 int level = 1;
 int candy = 0;
+int s;
+Timer startTimer;
 
 CollisionField testBox;
+
 
 void setup()
 {
   gameover = false;
   size(600, 600);
+  startTimer = new Timer(0);
   rocketFrontImage = loadImage("RocketFront.png");
   rocketRearImage = loadImage("RocketRear.png");
+  
 
   testBox = new CollisionField(new PVector(100,100),new PVector(width/4,100));
   font = loadFont("Stencil-48.vlw");
@@ -88,6 +99,8 @@ void setup()
   spaceBackGround = loadImage("SpaceBackground2.png");
   gameOverBackGround = loadImage("GameOverBackground.png");
   milkyWayCandyCollectable = loadImage("MilkyWayCollectable.png");
+  titleScreenBackground = loadImage("TempBanner.png");
+  
   //spaceBackGround.resize(600, 600);
   
  
@@ -119,15 +132,21 @@ void setup()
   }
   
   //Loading soundfx/music
-  musicFile = new SoundFile(this, "StartMusic.mp3");
-  musicFile.play();
+  musicFile = new SoundFile(this, "Opener3.wav");
+  //musicFile.play();
   musicFile.amp(0.3);
+  musicFile.loop();
+
   
-  stage2MusicFile = new SoundFile(this, "DiamondInTheSky.mp3");
+  stage2MusicFile = new SoundFile(this, "Stage2.mp3");
   stage2MusicFile.amp(0.3);
   
   crashSound = new SoundFile(this, "Crash.mp3");
   crashSound.amp(0.6);
+  
+  candyCollect = new SoundFile(this, "candyget.mp3");
+  crashSound.amp(0.5);
+
   frameRate(30);
   
 }
@@ -138,12 +157,19 @@ void draw()
   //Stage 1
   if(stage == 1)
   {
+    background(0);
+
    //Stars start from the center of the screen
-   translate(width/2, height/2);
+   translate(0,0);
+   //pushMatrix();
    //Speed of the stars is maped to the player's mouseX, or mouse movent along the width of the screen
    speed = map(mouseX, 0, width, 1, 15);
-   background(0);
+   //speed = 2.5;
+   imageMode(CORNER);
    
+   image(titleScreenBackground, -width/5.7, height/20, 800, 470);
+   //popMatrix();
+   translate(width/2, height/2);
    textFade();
    setTitleText();
    displayStars(); 
@@ -152,10 +178,29 @@ void draw()
    //Stage 2
    else if(stage == 2)
   {
+  
+
     //background starts from the corner of the screen
     imageMode(CORNER);
     image(spaceBackGround,0,0);
     
+    startTimer.countUp();
+    fill(255);
+    int s = Math.round(startTimer.getTime());
+    int m = 0;
+    
+    if(s < 10)
+    {
+          text("Time Elapsed: " + m + ":" + "0" + s, width/1.65, 30);
+
+    }
+    else
+    {
+    text("Time Elapsed: " + m + ":" + s, width/1.65, 30);
+    }
+    
+   
+
     setPlayerScoreLevelAndCandyText();
     setScoreTimeInterval();
     setLevelTimeInterval();
@@ -209,6 +254,7 @@ void getInput()
        musicFile.stop();
        stage2MusicFile.play();
        stage = 2;
+       timer4 = millis();
      }
  }
      
@@ -218,12 +264,16 @@ void getInput()
    if(key== 32)
      {
        crashSound.stop();
-       musicFile.play();
+       musicFile.loop();
        score = 0;
+       scoreMultiplyer = 10;
        level = 1;
        stage = 1;
        candy = 0;
        timePast3 = 0;
+       startTimer = new Timer(0);
+       
+       
      }
  }
  
@@ -249,10 +299,10 @@ void setTitleText()
 {
  textSize(32);
  textFont(font, 32);
- text("Rocket Rider!", -100, -250);
+ //text("Rocket Rider!", -100, -250);
  fill(255,255,255,textOpacity);
  rectMode(CENTER);
- text("Press enter to ride!", -width/3.5, 0);
+ text("Press enter to ride!", -width/3.5, height/3);
 }
 
  /*
@@ -293,7 +343,7 @@ void displayStars()
 */
 void setPlayerScoreLevelAndCandyText()
 {
-    textSize(22);
+    textSize(22);  
     fill(255,255,255,255);
     text("Score:" + score , 0, 30); 
     textSize(22);
@@ -302,6 +352,9 @@ void setPlayerScoreLevelAndCandyText()
     textSize(22);
     fill(255,255,255,255);
     text("Candy: " + candy, 0, 70);
+    textSize(22);
+    fill(255,255,255,255);
+    //text("Time Elapsed:" + startTimer.getTime(), width/1.65, 30);
  }
  
  /*
@@ -314,7 +367,9 @@ void setScoreTimeInterval()
     if(millis() > timePast + scoreInterval)
     {
        timePast = millis();
-       score += 10; 
+       score += scoreMultiplyer; 
+       
+       
     }
   
 }
@@ -378,6 +433,8 @@ void candyCollisionLogic()
         if(candies[i].box.isCollidingWith(myRocket.box))
         {
           candy++;
+          candyCollect.play();
+          scoreMultiplyer += 10;
          candies[i].resetCandyPostion();
             
           
@@ -400,7 +457,7 @@ void setGameOverText()
     
     fill(255);
     textSize(22);
-    text("Your score was: " + score + "\nYou were on level: " + level + "\nYou were alive for: " + score/20 + "sec.", 120, height/3); 
+    text("Your score was: " + score + "\nYou were on level: " + level + "\nYou were alive for: " + timeAlive + "sec." + "\nYou collected: " + candy + " Candies", 120, height/3); 
    
     text("Press the spacebar to play again" , 120, 400);  
   
@@ -425,14 +482,19 @@ void resetCandyAndObstaclePostions()
    obstacles[i].resetObstaclePostion();
    }
     
-    /*
+    
    for(int i = 0; i < candies.length; i++)
    {
    candies[i].resetCandyPostion();
    }
-   */
+   
   
 }
+
+
+
+  
+
 
 void scrollCamera()
 {
