@@ -10,12 +10,12 @@ class Obstacles
   float speed = 5;
   
   
-  Obstacles(float timePassed)
+  Obstacles()
   {
     x = random(-width, width);
     y = random(-height, height); 
 
-    this.timePassed = timePassed;   
+      
     pos = new PVector(x,y);
     box = new CollisionField(new PVector(40,40),pos);
   }
@@ -38,6 +38,7 @@ class Obstacles
      
     noStroke();
     imageMode(CENTER);
+    
     image(asteroid, pos.x, pos.y,50,50);
     
     if(pos.y <0)

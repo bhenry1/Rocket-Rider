@@ -3,6 +3,7 @@ import processing.sound.*;
 SoundFile musicFile;
 SoundFile stage2MusicFile;
 SoundFile crashSound;
+SoundFile candyCollect;
 
 PImage asteroid;
 PImage medAsteroid;
@@ -10,8 +11,12 @@ PFont font;
 PImage spaceBackGround;
 PImage rocketFrontImage;
 PImage rocketRearImage; 
+PImage gameOverBackGround;
+PImage milkyWayCandyCollectable;
+PImage titleScreenBackground;
 
 boolean gameover;
+
 
 Rocket myRocket;
 RocketFront front;
@@ -26,13 +31,17 @@ RocketRear rear_StagStag;
 StarField[] stars = new StarField[800];
 Obstacles[] obstacles = new Obstacles[10];
 MObstacles[] mObstacles = new MObstacles[1];
-PVector POI;
+
+Candy[] candies = new Candy[1];
+
 
 float speed;
 float timeInterval;
 float timePast;
 float timePast2;
 float timePast3;
+float timer4;
+
 float levelTimer = 15000;
 int keyInput;
 
@@ -41,32 +50,36 @@ PVector backPos;
 PVector  offset;
 
 
+//score increses every half a second
 float scoreInterval = 500;
 
-
+float timeAlive = 0;
 int stage = 1;
 int textOpacity = 100;
 int textFade = 2;
 int score = 0;
+int scoreMultiplyer = 1;
 int level = 1;
-Obstacles obj = new Obstacles(timePast3);
-MObstacles Mobj = new MObstacles();
-
+int candy = 0;
+int s;
+Timer startTimer;
 
 CollisionField testBox;
+
 
 void setup()
 {
   //z = 1;
   gameover = false;
   size(600, 600);
+  startTimer = new Timer(0);
   rocketFrontImage = loadImage("RocketFront.png");
   rocketRearImage = loadImage("RocketRear.png");
   
+
   backPos = new PVector((-width),0,1);
   offset = new PVector(0,0);
 
-  testBox= new CollisionField(new PVector(100,100),new PVector(width/4,100));
   font = loadFont("Stencil-48.vlw");
   timePast = millis();
   timePast2 = millis();
@@ -77,7 +90,6 @@ void setup()
   int size2= 30;
   
   //Front rocket parameters: Defense , Size
-  
   front_HollowPoint = new RocketFront(1,new PVector(size1,size1), rocketFrontImage);
   front_TankPoint = new RocketFront(5,new PVector(size1,size1), rocketFrontImage);
   
@@ -91,10 +103,16 @@ void setup()
   asteroid = loadImage("smallAstro.png");
   medAsteroid = loadImage("MedAstro.png");
   spaceBackGround = loadImage("SpaceBackground2.png");
+
+  gameOverBackGround = loadImage("GameOverBackground.png");
+  milkyWayCandyCollectable = loadImage("MilkyWayCollectable.png");
+  titleScreenBackground = loadImage("TempBanner.png");
+
+  
   //spaceBackGround.resize(600, 600);
   
-  
-  
+ 
+  //Filling Obstacle/star/astroid arrays
   for(int i = 0; i < stars.length; i++)
   {
     stars[i] = new StarField();
@@ -102,7 +120,7 @@ void setup()
   
   for(int i = 0; i < obstacles.length; i++)
   {
-        obstacles[i] = new Obstacles(timePast3);
+        obstacles[i] = new Obstacles();
         obstacles[i].resetObstaclePostion();
 
   }
@@ -114,15 +132,29 @@ void setup()
 
   }
   
-  musicFile = new SoundFile(this, "StartMusic.mp3");
-  musicFile.play();
-  musicFile.amp(0.3);
   
-  stage2MusicFile = new SoundFile(this, "DiamondInTheSky.mp3");
+  for(int i = 0; i < candies.length; i++)
+  {
+    candies[i] = new Candy();
+    candies[i].resetCandyPostion();
+  }
+  
+  //Loading soundfx/music
+  musicFile = new SoundFile(this, "Opener3.wav");
+  //musicFile.play();
+  musicFile.amp(0.3);
+  musicFile.loop();
+
+  
+  stage2MusicFile = new SoundFile(this, "Stage2.mp3");
   stage2MusicFile.amp(0.3);
   
   crashSound = new SoundFile(this, "Crash.mp3");
   crashSound.amp(0.6);
+  
+  candyCollect = new SoundFile(this, "candyget.mp3");
+  crashSound.amp(0.5);
+
   frameRate(30);
   
 }
@@ -135,19 +167,22 @@ void draw()
   //Stage 1
   if(stage == 1)
   {
-   translate(width/2, height/2);
+    background(0);
+
+   //Stars start from the center of the screen
+   translate(0,0);
+   //pushMatrix();
+   //Speed of the stars is maped to the player's mouseX, or mouse movent along the width of the screen
    speed = map(mouseX, 0, width, 1, 15);
-   background(0);
+   //speed = 2.5;
+   imageMode(CORNER);
+   
+   image(titleScreenBackground, -width/5.7, height/20, 800, 470);
+   //popMatrix();
+   translate(width/2, height/2);
    textFade();
-   
-   for(int i = 0; i < stars.length; i++)
-   {
-     stars[i].update();
-     stars[i].show();
-   }
-   
-   setText();
-     
+   setTitleText();
+   displayStars(); 
   }
   
    //Stage 2
@@ -166,93 +201,48 @@ void draw()
        timePast = millis();
        score += 10; 
     }
+
+    startTimer.countUp();
+    fill(255);
+    int s = Math.round(startTimer.getTime());
+    int m = 0;
     
-    
-    text("Score:" + score , 0, 30); 
-    textSize(22);
-    fill(255,255,255,255);
-    
-    if(millis() > timePast2 + levelTimer)
+    if(s < 10)
     {
-      timePast2 += millis();
-      level++;
-      
+       text("Time Elapsed: " + m + ":" + "0" + s, width/1.65, 30);
+    }
+    else
+    {
+    text("Time Elapsed: " + m + ":" + s, width/1.65, 30);
     }
     
-    text("Level: " + level, 0, 50);
-    
-      for(int i = 0; i < obstacles.length; i++)
-      {
-        
-        obstacles[i].update();
-        obstacles[i].show();
-        if(obstacles[i].box.isCollidingWith(myRocket.box))
-        {
-          obj.resetObstaclePostion();
-          
-          gameover = true;
-         //stage = 3;
-         
+    setPlayerScoreLevelAndCandyText();
+    setScoreTimeInterval();
+    setLevelTimeInterval();
+    handleCollisions();
+     
+    myRocket.move();
+    myRocket.display();
+    offset.x = x-myRocket.pos.x;
 
-        }
-      }
-      
-      for(int i = 0; i < mObstacles.length; i++)
-      {
-        mObstacles[i].update();
-        mObstacles[i].show();
-        if(mObstacles[i].box.isCollidingWith(myRocket.box))
-        {
-          gameover = true;
-          //stage = 3;
-          
-        }
-      } 
-      myRocket.move();
-      myRocket.display();
-      //println(x);
-      offset.x = x-myRocket.pos.x;
-      //println(offset.x);
-      /*if(myRocket.isMoving)
-      {
-        translate();
-      }*/
-      
   }
   
   //Stage 3
   else if(stage == 3)
   {
     stage2MusicFile.stop();
-    background(0);
-    fill(255);
-    textSize(22);
-    text("Your score was: " + score + "\nYou were on level: " + level + "\nYou were alive for: " + score/20 + "sec.", width/3, height/3); 
-    
-    textSize(22);
-    fill(255);
-   
-    text("Press the spacebar to play again" , 120, 400);  
+    background(gameOverBackGround);
+    setGameOverText();
    
   }
   
    if(gameover)
       {
         crashSound.play();
-
-         for(int i = 0; i < mObstacles.length; i++)
-         {
-           mObstacles[i].resetObstaclePostion();
-         }
-          for(int i = 0; i < obstacles.length; i++)
-         {
-           obstacles[i].resetObstaclePostion();
-         }
-         stage = 3;
+        resetObjects();
+        stage = 3;
         gameover = false;
       }
-
-
 }
 
 void getInput()
@@ -279,6 +269,7 @@ void getInput()
        musicFile.stop();
        stage2MusicFile.play();
        stage = 2;
+       timer4 = millis();
      }
  }
      
@@ -288,11 +279,16 @@ void getInput()
    if(key== 32)
      {
        crashSound.stop();
-       musicFile.play();
+       musicFile.loop();
        score = 0;
+       scoreMultiplyer = 1;
        level = 1;
        stage = 1;
+       candy = 0;
        timePast3 = 0;
+       startTimer = new Timer(0);
+       
+       
      }
  }
  
@@ -309,16 +305,26 @@ void keyReleased()
  }
 }
 
-void setText()
+/*
+*Method Name: setTitleText()
+*@param: None
+*DESC: This method creates the text seen on the title screen
+*/
+void setTitleText()
 {
  textSize(32);
  textFont(font, 32);
- text("Rocket Rider!", -100, -250);
+ //text("Rocket Rider!", -100, -250);
  fill(255,255,255,textOpacity);
  rectMode(CENTER);
- text("Press enter to ride!", -width/3.5, 0);
+ text("Press enter to ride!", -width/3.5, height/3);
 }
 
+ /*
+*Method Name: textFade()
+*@param: None
+*DESC: This method dispalys the fading in and out effect of the "Press Enter To Ride!" text.
+*/
 void textFade()
 {
   if(millis() > timeInterval + timePast)
@@ -328,4 +334,160 @@ void textFade()
   }
   
   textOpacity += textFade;
+}
+
+ /*
+*Method Name: displayStars()
+*@param: None
+*DESC: This method displays the stars on the title screen.
+*/
+void displayStars()
+{
+  for(int i = 0; i < stars.length; i++)
+   {
+     stars[i].update();
+     stars[i].show();
+   }
+  
+}
+
+ /*
+*Method Name: setPlayerScoreLevelAndCandyText()
+*@param: None
+*DESC: This method sets the score, level, and candy text at the top left of the screen
+*/
+void setPlayerScoreLevelAndCandyText()
+{
+    textSize(22);  
+    fill(255,255,255,255);
+    text("Score:" + score , 0, 30); 
+    textSize(22);
+    fill(255,255,255,255);
+    text("Level: " + level, 0, 50);
+    textSize(22);
+    fill(255,255,255,255);
+    text("Candy: " + candy, 0, 70);
+    textSize(22);
+    fill(255,255,255,255);
+    //text("Time Elapsed:" + startTimer.getTime(), width/1.65, 30);
+ }
+ 
+ /*
+*Method Name: setScoreTimeInterval()
+*@param: None
+*DESC: This method increments the "score text interval by 10 every half a second
+*/
+void setScoreTimeInterval()
+{
+    if(millis() > timePast + scoreInterval)
+    {
+       timePast = millis();
+       score += scoreMultiplyer*10; 
+       
+       
+    }
+  
+}
+
+/*
+*Method Name: setLevelTimeInterval()
+*@param: None
+*DESC: This method increments the "level" text every 15 seconds
+*/
+void setLevelTimeInterval()
+{
+   if(millis() > timePast2 + levelTimer)
+    {
+      timePast2 += millis();
+      level++; 
+    }
+}
+
+/*
+*Method Name: handleCollisions()
+*@param: None
+*DESC: This method contains the logic for obstacle collison as well as generating astroids.
+*/
+void handleCollisions()
+{
+  for(int i =0; i < candies.length; i++)
+   {
+      candies[i].update();
+      candies[i].show();
+      if(candies[i].box.isCollidingWith(myRocket.box))
+      {
+        candy++;
+        candyCollect.play();
+        scoreMultiplyer += 1;
+       candies[i].resetCandyPostion();
+      }
+    }
+    for(int i = 0; i < obstacles.length; i++)
+      {
+        
+        obstacles[i].update();
+        obstacles[i].show();
+        if(obstacles[i].box.isCollidingWith(myRocket.box))
+        { 
+          gameover = true;
+        }
+      }
+      for(int i = 0; i < mObstacles.length; i++)
+      {
+        mObstacles[i].update();
+        mObstacles[i].show();
+        if(mObstacles[i].box.isCollidingWith(myRocket.box))
+        {
+          gameover = true;
+          
+        }
+      }
+      
+}
+
+/*
+*Method Name: setGameOverText()
+*@param: None
+*DESC: This method sets the text the player sees at the game over screen.
+*/
+void setGameOverText()
+{
+    fill(255);
+    textSize(70);
+    text("YOU CRASHED!", width/9, 100);
+    
+    fill(255);
+    textSize(22);
+    text("Your score was: " + score + "\nYou were on level: " + level + "\nYou were alive for: " + timeAlive + "sec." + "\nYou collected: " + candy + " Candies", 120, height/3); 
+   
+    text("Press the spacebar to play again" , 120, 400);  
+  
+}
+
+/*
+*Method Name: resetObjects()
+*@param: None
+*DESC: This method resets the postions of the obstacles and candy 
+*upon astroid collision so that when the player restarts a new game 
+*they dont immeditely collide with an astroid. 
+*/
+void resetObjects()
+{
+  for(int i = 0; i < mObstacles.length; i++)
+   {
+    mObstacles[i].resetObstaclePostion();
+   }
+  
+  for(int i = 0; i < obstacles.length; i++)
+   {
+   obstacles[i].resetObstaclePostion();
+   }
+    
+    
+   for(int i = 0; i < candies.length; i++)
+   {
+   candies[i].resetCandyPostion();
+   }
+   
+  
 }
