@@ -8,13 +8,14 @@ class Rocket
   RocketFront front;
   RocketRear rear;
   CollisionField box;
+  boolean isMoving;
   
   float mass,speed,limit;
   
-  //public Rocket(float x,float y, float r, float speed, float tiltSpeed)
-  public Rocket(float x,float y, RocketFront front, RocketRear rear)
+  //public Rocket(float x,float y, float z, float r, float speed, float tiltSpeed)
+  public Rocket(float x,float y, float z, RocketFront front, RocketRear rear)
   {
-    this.pos = new PVector(x,y);
+    this.pos = new PVector(x,y,z);
     this.front = front;
     this.rear = rear;
     this.acceleration = new PVector(0,0);
@@ -26,6 +27,7 @@ class Rocket
     this.speed = 1+(this.rear.thrustSpeed);
     this.limit = 5+ this.rear.speedLimit;
     box = new CollisionField(new PVector(10,60),this.pos);
+    isMoving = false;
   }
   
   void move()
@@ -77,10 +79,12 @@ class Rocket
     if(pos.x>=width)
     {
       pos.x = width;
+      isMoving = false;
     }
     if(pos.x<=0)
     {
       pos.x = 0;
+      isMoving = false;
     }
     box.display(pos);
   }
@@ -90,12 +94,14 @@ class Rocket
    direction.x = -1;
    PVector f = new PVector(direction.x*speed,0);
    this.applyForce(f);
+   isMoving = true;
   }
   void moveRight()
   {
    direction.x = 1;
    PVector f = new PVector(direction.x*speed,0);
    this.applyForce(f);
+   isMoving = true;
   }
   
   void applyForce(PVector force)

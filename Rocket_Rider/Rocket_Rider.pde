@@ -26,6 +26,7 @@ RocketRear rear_StagStag;
 StarField[] stars = new StarField[800];
 Obstacles[] obstacles = new Obstacles[10];
 MObstacles[] mObstacles = new MObstacles[1];
+PVector POI;
 
 float speed;
 float timeInterval;
@@ -34,9 +35,10 @@ float timePast2;
 float timePast3;
 float levelTimer = 15000;
 int keyInput;
-//Astroid Postions
-float x;
-float y;
+
+float x,y,z;
+PVector backPos;
+PVector  offset;
 
 
 float scoreInterval = 500;
@@ -55,12 +57,16 @@ CollisionField testBox;
 
 void setup()
 {
+  //z = 1;
   gameover = false;
   size(600, 600);
   rocketFrontImage = loadImage("RocketFront.png");
   rocketRearImage = loadImage("RocketRear.png");
+  
+  backPos = new PVector((-width),0,1);
+  offset = new PVector(0,0);
 
-  testBox = new CollisionField(new PVector(100,100),new PVector(width/4,100));
+  testBox= new CollisionField(new PVector(100,100),new PVector(width/4,100));
   font = loadFont("Stencil-48.vlw");
   timePast = millis();
   timePast2 = millis();
@@ -80,11 +86,11 @@ void setup()
    rear_PuffPuff = new RocketRear(2,10,new PVector(size2,size2), rocketRearImage);
    rear_StagStag = new RocketRear(10,10,new PVector(size2,size2), rocketRearImage);
    //ROCKET IS BUILT
-   myRocket = new Rocket(width/2,height/4,front_HollowPoint,rear_PuffPuff);
+   myRocket = new Rocket(width/2,height/4,5,front_HollowPoint,rear_PuffPuff);
   
   asteroid = loadImage("smallAstro.png");
   medAsteroid = loadImage("MedAstro.png");
-  spaceBackGround = loadImage("Space.png");
+  spaceBackGround = loadImage("SpaceBackground2.png");
   //spaceBackGround.resize(600, 600);
   
   
@@ -123,6 +129,8 @@ void setup()
 
 void draw()
 {
+  x = myRocket.pos.x;
+  //y = myRocket.pos.y;
   getInput();
   //Stage 1
   if(stage == 1)
@@ -144,10 +152,12 @@ void draw()
   
    //Stage 2
    else if(stage == 2)
-  {
+  {     
+    //offset.y = myRocket.pos.y-x;
     //background(spaceBackGround);
     imageMode(CORNER);
-    image(spaceBackGround,0,0);
+    backPos.x = backPos.x+(backPos.z*(offset.x/myRocket.pos.z));
+    image(spaceBackGround,backPos.x,0);
     textSize(22);
     fill(255,255,255,255);
    
@@ -200,6 +210,14 @@ void draw()
       } 
       myRocket.move();
       myRocket.display();
+      //println(x);
+      offset.x = x-myRocket.pos.x;
+      //println(offset.x);
+      /*if(myRocket.isMoving)
+      {
+        translate();
+      }*/
+      
   }
   
   //Stage 3
@@ -220,7 +238,6 @@ void draw()
   
    if(gameover)
       {
-        
         crashSound.play();
 
          for(int i = 0; i < mObstacles.length; i++)
@@ -311,9 +328,4 @@ void textFade()
   }
   
   textOpacity += textFade;
-}
-
-void scrollCamera()
-{
-  
 }
