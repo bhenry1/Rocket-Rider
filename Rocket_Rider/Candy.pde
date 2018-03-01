@@ -16,7 +16,7 @@ class Candy
     x2 = random(-width, width);
     y2 = random(-height, height); 
     pos = new PVector(x2,y2);
-    box = new CollisionField(new PVector(70,30),pos);
+    box = new CollisionField(new PVector(50,45),pos);
     
   }
   
