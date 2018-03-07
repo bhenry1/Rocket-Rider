@@ -4,6 +4,7 @@ SoundFile musicFile;
 SoundFile stage2MusicFile;
 SoundFile crashSound;
 SoundFile candyCollect;
+SoundFile gameOverMusic;
 
 PImage asteroid;
 PImage medAsteroid;
@@ -60,7 +61,8 @@ int score = 0;
 int scoreMultiplyer = 1;
 int level = 1;
 int candy = 0;
-int s;
+int secondsEllapsed = 0;
+int minutesEllapsed = 0;
 Timer startTimer;
 
 CollisionField testBox;
@@ -118,7 +120,7 @@ void setup()
 
   gameOverBackGround = loadImage("GameOverBackground.png");
   milkyWayCandyCollectable = loadImage("MilkyWayCollectable.png");
-  titleScreenBackground = loadImage("TempBanner.png");
+  titleScreenBackground = loadImage("title2.png");
 
   
   //spaceBackGround.resize(600, 600);
@@ -163,13 +165,13 @@ void setup()
   }
 
   //Loading soundfx/music
-  musicFile = new SoundFile(this, "Opener3.wav");
+  musicFile = new SoundFile(this, "StartMusic.mp3");
   //musicFile.play();
   musicFile.amp(0.3);
   musicFile.loop();
 
   
-  stage2MusicFile = new SoundFile(this, "Stage2.mp3");
+  stage2MusicFile = new SoundFile(this, "DiamondInTheSky.mp3");
   stage2MusicFile.amp(0.3);
   
   crashSound = new SoundFile(this, "Crash.mp3");
@@ -177,6 +179,9 @@ void setup()
   
   candyCollect = new SoundFile(this, "candyget.mp3");
   crashSound.amp(0.5);
+  
+  gameOverMusic = new SoundFile(this, "gameover.mp3");
+  gameOverMusic.amp(0.5);
 
   frameRate(30);
   /**
@@ -199,6 +204,7 @@ void draw()
   //Stage 1
   if(stage == 1)
   {
+       
     background(0);
 
    //Stars start from the center of the screen
@@ -209,7 +215,7 @@ void draw()
 
    imageMode(CORNER);
    
-   image(titleScreenBackground, -width/5.7, height/20, 800, 470);
+   image(titleScreenBackground, -width/5.7, height/20, 800, 600);
    //popMatrix();
    translate(width/2, height/2);
    textFade();
@@ -227,24 +233,25 @@ void draw()
     //image(spaceBackGround,backPos.x,0);
     textSize(22);
    
-    if(millis() > timePast + scoreInterval)
-    {
-       timePast = millis();
-       score += 10; 
-    }
-
     startTimer.countUp();
     fill(255);
-    int s = Math.round(startTimer.getTime());
-    int m = 0;
+    secondsEllapsed = Math.round(startTimer.getTime());
+   
     
-    if(s < 10)
+    if(secondsEllapsed < 10)
     {
-       text("Time Elapsed: " + m + ":" + "0" + s, width/1.65, 30);
+      
+       text("Time Elapsed: " + minutesEllapsed + ":" + "0" + secondsEllapsed, width/1.65, 30);
     }
     else
     {
-    text("Time Elapsed: " + m + ":" + s, width/1.65, 30);
+       text("Time Elapsed: " + minutesEllapsed + ":" + secondsEllapsed, width/1.65, 30);
+    
+      if( secondsEllapsed >= 60)
+      {
+        startTimer = new Timer(0);
+        minutesEllapsed++;
+      }
     }
     
     setPlayerScoreLevelAndCandyText();
@@ -270,6 +277,7 @@ void draw()
    if(gameover)
       {
         crashSound.play();
+        gameOverMusic.play();
         resetObjects();
         stage = 3;
         gameover = false;
@@ -310,7 +318,9 @@ void getInput()
    if(key== 32)
      {
        crashSound.stop();
+       gameOverMusic.stop();
        musicFile.loop();
+       minutesEllapsed = 0;
        score = 0;
        scoreMultiplyer = 1;
        level = 1;
@@ -409,11 +419,15 @@ void setPlayerScoreLevelAndCandyText()
 */
 void setScoreTimeInterval()
 {
+  
+  
+  
     if(millis() > timePast + scoreInterval)
     {
        timePast = millis();
        score += scoreMultiplyer*10; 
     }
+
 }
 
 /*
@@ -423,11 +437,23 @@ void setScoreTimeInterval()
 */
 void setLevelTimeInterval()
 {
+  /*
+  
    if(millis() > timePast2 + levelTimer)
     {
       timePast2 += millis();
       level++; 
     }
+    */
+    
+    //THIS IS A BUGG
+     if(secondsEllapsed == 5)
+     {
+      level++;
+      }
+        
+      
+ 
 }
 
 /*
@@ -436,24 +462,24 @@ void setLevelTimeInterval()
 *DESC: This method contains the logic for obstacle collison as well as generating astroids.
 */
 void updateObjects()
-{
-  
+{ 
    for(int i = 0; i < spaceObjects.size(); i++)
-      {
-        
+   {
         SpaceObject o = spaceObjects.get(i);
         o.update();
         o.show();
         if(o.box.isCollidingWith(myRocket.box))
         {
-          /*if(o.getTag()=="obstacle")
+          if(o.getTag()=="obstacle")
           {
             gameover = true;
           }
           else if(o.getTag()=="collectable")
           {
-             o.setPosition(random(width),random(height,height*2));
-          }*/
+            candyCollect.play();
+            scoreMultiplyer++;
+            //o.setPosition(random(width),random(height,height*2));
+          }
           setLane(o);
         
         }
@@ -478,7 +504,7 @@ void setGameOverText()
     
     fill(255);
     textSize(22);
-    text("Your score was: " + score + "\nYou were on level: " + level + "\nYou were alive for: " + timeAlive + "sec." + "\nYou collected: " + candy + " Candies", 120, height/3); 
+    text("Your score was: " + score + "\nYou were on level: " + level + "\nYou were alive for: " + minutesEllapsed + " minute(s) and " + secondsEllapsed + "  sec." + "\nYou collected: " + candy + " Candies", 60, height/3); 
    
     text("Press the spacebar to play again" , 120, 400);  
   
