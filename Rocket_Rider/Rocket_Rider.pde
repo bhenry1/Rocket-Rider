@@ -29,11 +29,10 @@ RocketRear rear_PuffPuff;
 RocketRear rear_StagStag;
 
 StarField[] stars = new StarField[800];
-Obstacles[] obstacles = new Obstacles[10];
-MObstacles[] mObstacles = new MObstacles[1];
-
-Candy[] candies = new Candy[1];
-
+ArrayList<SpaceObject> spaceObjects = new ArrayList<SpaceObject>();
+float candyCount;
+float smAsteroidCount;
+float medAsteroidCount;
 
 float speed;
 float timeInterval;
@@ -66,6 +65,8 @@ Timer startTimer;
 
 CollisionField testBox;
 
+int laneCount;
+int lastLane;
 
 void setup()
 {
@@ -89,7 +90,13 @@ void setup()
   int size1 = 30;
   int size2= 30;
   
-  //Front rocket parameters: Defense , Size
+  laneCount = 10;
+  lastLane = 0;
+  
+  /*
+  CREATE THE ROCKET BY MAKING PARTS(FRONT/REAR) and COMBINING INTO A ROCKET OBJECT
+  */
+  //Front rocket parameters: Defense(How much damage can your rocket take) , Size(The size of the rocket)
   front_HollowPoint = new RocketFront(1,new PVector(size1,size1), rocketFrontImage);
   front_TankPoint = new RocketFront(5,new PVector(size1,size1), rocketFrontImage);
   
@@ -99,6 +106,11 @@ void setup()
    rear_StagStag = new RocketRear(10,10,new PVector(size2,size2), rocketRearImage);
    //ROCKET IS BUILT
    myRocket = new Rocket(width/2,height/4,5,front_HollowPoint,rear_PuffPuff);
+  
+  
+  /**
+  GAME IMAGES ARE DEFINED AND LOADED HERE
+  **/
   
   asteroid = loadImage("smallAstro.png");
   medAsteroid = loadImage("MedAstro.png");
@@ -112,33 +124,44 @@ void setup()
   //spaceBackGround.resize(600, 600);
   
  
-  //Filling Obstacle/star/astroid arrays
+
+  /**
+  CREATE THE OBJECTS FOR THE GAME AND STORE THEM IN AN ARRAY LIST
+  **/
+  candyCount = 5;
+  smAsteroidCount = 10;
+  medAsteroidCount = 3;
+  for(int i = 0; i < candyCount; i++)
+  {
+    SpaceObject o = new SpaceObject(milkyWayCandyCollectable,new CollisionField(new PVector(40,20),new PVector(0,0)),"collectable");
+    o.setSpeed(8);
+    o.setGraphicScale(42,22);
+    o.setPosition(random(width),random(height,height*2)); 
+    spaceObjects.add(o);  
+  }
+  for(int i = 0; i < smAsteroidCount; i++)
+  {
+     SpaceObject o = new SpaceObject(asteroid,new CollisionField(new PVector(40,40),new PVector(0,0)),"obstacle");
+     o.setSpeed(8);
+     o.setGraphicScale(50,50);
+     o.setPosition(random(width),random(height,height*2));
+     spaceObjects.add(o);
+   }
+  for(int i = 0; i < medAsteroidCount; i++)
+  {
+   SpaceObject o = new SpaceObject(medAsteroid,new CollisionField(new PVector(40,60),new PVector(0,0)),"obstacle");
+     o.setSpeed(15);
+     o.setGraphicScale(45,75);
+     o.setPosition(random(width),random(height,height*2));
+     spaceObjects.add(o);
+  }
+  
+  
   for(int i = 0; i < stars.length; i++)
   {
     stars[i] = new StarField();
   }
-  
-  for(int i = 0; i < obstacles.length; i++)
-  {
-        obstacles[i] = new Obstacles();
-        obstacles[i].resetObstaclePostion();
 
-  }
-  
-  for(int i = 0; i < mObstacles.length; i++)
-  {
-        mObstacles[i] = new MObstacles();
-        mObstacles[i].resetObstaclePostion();
-
-  }
-  
-  
-  for(int i = 0; i < candies.length; i++)
-  {
-    candies[i] = new Candy();
-    candies[i].resetCandyPostion();
-  }
-  
   //Loading soundfx/music
   musicFile = new SoundFile(this, "Opener3.wav");
   //musicFile.play();
@@ -156,12 +179,21 @@ void setup()
   crashSound.amp(0.5);
 
   frameRate(30);
+  /**
+  LOOP THAT SETS THE LANE POSITIONS FOR OBJECTS
+  **/
+  for(int i = 0; i < spaceObjects.size(); i++)
+  {
+    SpaceObject o = spaceObjects.get(i);
+    setLane(o);
+  }
   
 }
 
 void draw()
 {
   x = myRocket.pos.x;
+  background(0);
   //y = myRocket.pos.y;
   getInput();
   //Stage 1
@@ -174,7 +206,7 @@ void draw()
    //pushMatrix();
    //Speed of the stars is maped to the player's mouseX, or mouse movent along the width of the screen
    speed = map(mouseX, 0, width, 1, 15);
-   //speed = 2.5;
+
    imageMode(CORNER);
    
    image(titleScreenBackground, -width/5.7, height/20, 800, 470);
@@ -192,9 +224,8 @@ void draw()
     //background(spaceBackGround);
     imageMode(CORNER);
     backPos.x = backPos.x+(backPos.z*(offset.x/myRocket.pos.z));
-    image(spaceBackGround,backPos.x,0);
+    //image(spaceBackGround,backPos.x,0);
     textSize(22);
-    fill(255,255,255,255);
    
     if(millis() > timePast + scoreInterval)
     {
@@ -219,12 +250,12 @@ void draw()
     setPlayerScoreLevelAndCandyText();
     setScoreTimeInterval();
     setLevelTimeInterval();
-    handleCollisions();
+    
+    updateObjects();
      
     myRocket.move();
     myRocket.display();
     offset.x = x-myRocket.pos.x;
-
   }
   
   //Stage 3
@@ -287,7 +318,6 @@ void getInput()
        candy = 0;
        timePast3 = 0;
        startTimer = new Timer(0);
-       
        
      }
  }
@@ -383,10 +413,7 @@ void setScoreTimeInterval()
     {
        timePast = millis();
        score += scoreMultiplyer*10; 
-       
-       
     }
-  
 }
 
 /*
@@ -408,41 +435,34 @@ void setLevelTimeInterval()
 *@param: None
 *DESC: This method contains the logic for obstacle collison as well as generating astroids.
 */
-void handleCollisions()
+void updateObjects()
 {
-  for(int i =0; i < candies.length; i++)
-   {
-      candies[i].update();
-      candies[i].show();
-      if(candies[i].box.isCollidingWith(myRocket.box))
-      {
-        candy++;
-        candyCollect.play();
-        scoreMultiplyer += 1;
-       candies[i].resetCandyPostion();
-      }
-    }
-    for(int i = 0; i < obstacles.length; i++)
+  
+   for(int i = 0; i < spaceObjects.size(); i++)
       {
         
-        obstacles[i].update();
-        obstacles[i].show();
-        if(obstacles[i].box.isCollidingWith(myRocket.box))
-        { 
-          gameover = true;
-        }
-      }
-      for(int i = 0; i < mObstacles.length; i++)
-      {
-        mObstacles[i].update();
-        mObstacles[i].show();
-        if(mObstacles[i].box.isCollidingWith(myRocket.box))
+        SpaceObject o = spaceObjects.get(i);
+        o.update();
+        o.show();
+        if(o.box.isCollidingWith(myRocket.box))
         {
-          gameover = true;
-          
+          /*if(o.getTag()=="obstacle")
+          {
+            gameover = true;
+          }
+          else if(o.getTag()=="collectable")
+          {
+             o.setPosition(random(width),random(height,height*2));
+          }*/
+          setLane(o);
+        
+        }
+       if(o.isOffScreen())
+        {
+           setLane(o);
+          //o.setPosition(random(width),random(height,height*2));
         }
       }
-      
 }
 
 /*
@@ -473,21 +493,24 @@ void setGameOverText()
 */
 void resetObjects()
 {
-  for(int i = 0; i < mObstacles.length; i++)
-   {
-    mObstacles[i].resetObstaclePostion();
-   }
   
-  for(int i = 0; i < obstacles.length; i++)
-   {
-   obstacles[i].resetObstaclePostion();
-   }
-    
-    
-   for(int i = 0; i < candies.length; i++)
-   {
-   candies[i].resetCandyPostion();
-   }
-   
-  
+  for(int i = 0; i < spaceObjects.size(); i++)
+      {
+        SpaceObject o = spaceObjects.get(i);
+        o.setPosition(random(width),random(height,height*2));
+      }
+}
+
+void setLane(SpaceObject o)
+{
+     float lane = int(random(laneCount));
+      while(lastLane == lane)
+      {
+        lane = int(random(0,laneCount));
+      }
+      lastLane = int(lane);
+      float laneX = (lane/laneCount)*width;
+      float laneY = height*3 + ((lane/5)*height);
+      //println(laneY);
+      o.setPosition(laneX,random(height,laneY));   
 }

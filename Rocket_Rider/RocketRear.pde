@@ -24,7 +24,6 @@ class RocketRear
   {
     fill(c);
    imageMode(CENTER);
-   //177, 282
    image(rocketRearImage, pos.x,pos.y, 177/6, 282/6);
   }
 }
