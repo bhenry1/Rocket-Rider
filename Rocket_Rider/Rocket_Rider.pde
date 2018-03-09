@@ -23,6 +23,7 @@ Rocket myRocket;
 RocketFront front;
 RocketFront front_HollowPoint;
 RocketFront front_TankPoint;
+RocketFront front_GunayPoint;
 
 RocketRear rear;
 RocketRear rear_BoomBoom;
@@ -100,14 +101,16 @@ void setup()
   */
   //Front rocket parameters: Defense(How much damage can your rocket take) , Size(The size of the rocket)
   front_HollowPoint = new RocketFront(1,new PVector(size1,size1), rocketFrontImage);
+  front_GunayPoint = new RocketFront(2.5,new PVector(size1,size1), rocketFrontImage);
   front_TankPoint = new RocketFront(5,new PVector(size1,size1), rocketFrontImage);
+ 
   
   //Rear Rocket parameters: ThrustSpeed, SpeedLimit , Size
    rear_BoomBoom = new RocketRear(20,1,new PVector(size2,size2), rocketRearImage);
-   rear_PuffPuff = new RocketRear(2,10,new PVector(size2,size2), rocketRearImage);
+   rear_PuffPuff = new RocketRear(5,8,new PVector(size2,size2), rocketRearImage);
    rear_StagStag = new RocketRear(10,10,new PVector(size2,size2), rocketRearImage);
    //ROCKET IS BUILT
-   myRocket = new Rocket(width/2,height/4,5,front_HollowPoint,rear_PuffPuff);
+   myRocket = new Rocket(width/2,height/2.5,5,front_GunayPoint,rear_BoomBoom);
   
   
   /**
@@ -470,18 +473,7 @@ void updateObjects()
         o.show();
         if(o.box.isCollidingWith(myRocket.box))
         {
-          if(o.getTag()=="obstacle")
-          {
-            gameover = true;
-          }
-          else if(o.getTag()=="collectable")
-          {
-            candyCollect.play();
-            scoreMultiplyer++;
-            //o.setPosition(random(width),random(height,height*2));
-          }
-          setLane(o);
-        
+          handleCollision(o,myRocket);
         }
        if(o.isOffScreen())
         {
@@ -507,7 +499,6 @@ void setGameOverText()
     text("Your score was: " + score + "\nYou were on level: " + level + "\nYou were alive for: " + minutesEllapsed + " minute(s) and " + secondsEllapsed + "  sec." + "\nYou collected: " + candy + " Candies", 60, height/3); 
    
     text("Press the spacebar to play again" , 120, 400);  
-  
 }
 
 /*
@@ -523,7 +514,8 @@ void resetObjects()
   for(int i = 0; i < spaceObjects.size(); i++)
       {
         SpaceObject o = spaceObjects.get(i);
-        o.setPosition(random(width),random(height,height*2));
+        setLane(o);
+       // o.setPosition(random(width),random(height,height*2));
       }
 }
 
@@ -539,4 +531,27 @@ void setLane(SpaceObject o)
       float laneY = height*3 + ((lane/5)*height);
       //println(laneY);
       o.setPosition(laneX,random(height,laneY));   
+}
+
+void handleCollision(SpaceObject o, Rocket r)
+{
+  
+          if(o.getTag()=="obstacle")
+          {
+            float laneY = height/2.5;
+            r.pos.y -=(laneY*(1/r.recoverForce.y));
+            println("GOT HIT");
+            if(r.pos.y<0)
+            {
+               gameover = true;
+            }
+           //
+          }
+          else if(o.getTag()=="collectable")
+          {
+            candyCollect.play();
+            scoreMultiplyer++;
+            //o.setPosition(random(width),random(height,height*2));
+          }
+          setLane(o);
 }

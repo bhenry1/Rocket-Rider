@@ -5,10 +5,12 @@ class Rocket
   PVector acceleration;
   PVector decceleration;
   PVector direction;
+  PVector recoverForce;
   RocketFront front;
   RocketRear rear;
   CollisionField box;
   boolean isMoving;
+  int recoverCount;
   
   float mass,speed,limit;
   
@@ -26,12 +28,15 @@ class Rocket
     this.mass = this.front.defense;
     this.speed = 1+(this.rear.thrustSpeed);
     this.limit = 5+ this.rear.speedLimit;
-    box = new CollisionField(new PVector(10,60),this.pos);
-    isMoving = false;
+    this.box = new CollisionField(new PVector(10,60),this.pos);
+    this.isMoving = false;
+    this.recoverCount = 50;
+    this.recoverForce = new PVector(0,this.front.defense);
   }
   
   void move()
   {
+    this.recover();
     
     if(direction.x==0)
     {
@@ -109,5 +114,29 @@ class Rocket
     PVector f = force.copy();
     f.div(mass);
     acceleration.add(f);
+  }
+  void recover()
+  {
+    if(recoverCount<=0)
+    {
+      if(pos.y<height/2.5)
+      {
+        
+        //pos.y+=recoverForce.y*10;
+        println("Here");
+         this.applyForce(new PVector(0,10/recoverForce.y));
+      }
+      recoverCount = 50;
+    }
+    else
+    {
+       recoverCount--; 
+    }
+      if (pos.y>height/2.5)
+      {
+        pos.y=height/2.5;
+        //this.applyForce(new PVector(0,-5));
+      }
+    
   }
 }
