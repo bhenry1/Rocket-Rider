@@ -5,6 +5,7 @@ SoundFile stage2MusicFile;
 SoundFile crashSound;
 SoundFile candyCollect;
 SoundFile gameOverMusic;
+SoundFile levelUp;
 
 PImage asteroid;
 PImage medAsteroid;
@@ -73,7 +74,7 @@ int score = 0;
 int scoreMultiplyer = 1;
 int level = 1;
 int candy = 0;
-int secondsEllapsed = 0;
+float secondsEllapsed = 0;
 int minutesEllapsed = 0;
 Timer startTimer;
 
@@ -172,7 +173,7 @@ void setup()
   medAsteroid = loadImage("data/MedAstro.png");
   spaceBackGround = loadImage("SpaceBackground2.png");
 
-  gameOverBackGround = loadImage("GameOverBackground.png");
+  gameOverBackGround = loadImage("GameOverScreen.png");
   milkyWayCandyCollectable = loadImage("MilkyWayCollectable.png");
   titleScreenBackground = loadImage("title2.png");
 
@@ -212,10 +213,13 @@ void setup()
   crashSound.amp(0.6);
   
   candyCollect = new SoundFile(this, "candyget.mp3");
-  crashSound.amp(0.5);
+  candyCollect.amp(0.3);
   
   gameOverMusic = new SoundFile(this, "gameover.mp3");
   gameOverMusic.amp(0.5);
+  
+  levelUp = new SoundFile(this, "levelUp.mp3");
+  levelUp.amp(0.5);
 
   frameRate(30);
   /**
@@ -268,23 +272,36 @@ void draw()
    
     startTimer.countUp();
     fill(255);
-    secondsEllapsed = Math.round(startTimer.getTime());
+    secondsEllapsed = startTimer.getTime();
+
    
     
     if(secondsEllapsed < 10)
     {
       
-       text("Time Elapsed: " + minutesEllapsed + ":" + "0" + secondsEllapsed, width/1.65, 30);
+       text("Time Elapsed: " + minutesEllapsed + ":" + "0" + secondsEllapsed, width/1.55, 30);
     }
     else
     {
-       text("Time Elapsed: " + minutesEllapsed + ":" + secondsEllapsed, width/1.65, 30);
+       text("Time Elapsed: " + minutesEllapsed + ":" + secondsEllapsed, width/1.55, 30);
     
       if( secondsEllapsed >= 60)
       {
         startTimer = new Timer(0);
         minutesEllapsed++;
+        level++;
+        levelUp.play();
+
       }
+      
+      if(Math.round(secondsEllapsed) == 60)
+     {
+         textSize(30);
+         text("level: " + level, width/1.55, height/2); 
+     }
+        
+      
+ 
     }
     
     setPlayerScoreLevelAndCandyText();
@@ -331,7 +348,7 @@ void draw()
   else if(stage == 3)
   {
     stage2MusicFile.stop();
-    background(gameOverBackGround);
+    image(gameOverBackGround, width/2, height/2, 600, 600);
     setGameOverText();
    
   }
@@ -546,15 +563,11 @@ void setPlayerScoreLevelAndCandyText()
 */
 void setScoreTimeInterval()
 {
-  
-  
-  
     if(millis() > timePast + scoreInterval)
     {
        timePast = millis();
        score += scoreMultiplyer*10; 
     }
-
 }
 
 /*
@@ -573,11 +586,24 @@ void setLevelTimeInterval()
     }
     */
     
-    //THIS IS A BUGG
-     if(secondsEllapsed == 5)
+    
+    
+     float levelInterval = 30;
+     float secondLevelInterval = 30.03;
+     if((secondsEllapsed > levelInterval) && (secondsEllapsed < secondLevelInterval))
      {
       level++;
-      }
+      levelUp.play();
+      
+       
+      
+     }
+     
+      if(Math.round(secondsEllapsed) == levelInterval)
+     {
+         textSize(30);
+         text("level: " + level, width/1.55, height/2); 
+     }
         
       
  
@@ -597,7 +623,7 @@ void setGameOverText()
     
     fill(255);
     textSize(22);
-    text("Your score was: " + score + "\nYou were on level: " + level + "\nYou were alive for: " + minutesEllapsed + " minute(s) and " + secondsEllapsed + "  sec." + "\nYou collected: " + candy + " Candies", 60, height/3); 
+    text("Your score was: " + score + "\nYou were on level: " + level + "\nYou were alive for: " + minutesEllapsed + " minute(s) and " + Math.round(secondsEllapsed) + "  sec." + "\nYou collected: " + candy + " Candies", 60, height/3); 
    
     text("Press the spacebar to play again" , 120, 400);  
 }
@@ -689,7 +715,6 @@ void updateObjects()
 
 void resetObjects()
 {
-  
   for(int i = 0; i < spaceObjects.size(); i++)
       {
         SpaceObject o = spaceObjects.get(i);
@@ -714,16 +739,16 @@ void setLane(SpaceObject o)
 
 void handleCollision(SpaceObject o, Rocket r)
 {
-  
           if(o.getTag()=="obstacle")
           {
             float laneY = height/2.5;
             r.pos.y -=(laneY*(1/r.recoverForce.y));
-            //println("GOT HIT");
+            crashSound.play();
           }
           else if(o.getTag()=="collectable")
           {
             candyCollect.play();
+            candy++;
             scoreMultiplyer++;
             //o.setPosition(random(width),random(height,height*2));
           }
