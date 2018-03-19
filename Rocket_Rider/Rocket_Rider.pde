@@ -111,7 +111,7 @@ void setup()
    rear_PuffPuff = new RocketRear(5,8,new PVector(size2,size2), rocketRearImage);
    rear_StagStag = new RocketRear(10,10,new PVector(size2,size2), rocketRearImage);
    //ROCKET IS BUILT
-   myRocket = new Rocket(width/2,height/2.5,5,front_GunayPoint,rear_BoomBoom);
+   myRocket = new Rocket(width/2,height/2.5,5,front_HollowPoint,rear_BoomBoom);
   
   
   /**
@@ -299,6 +299,7 @@ void draw()
         crashSound.play();
         gameOverMusic.play();
         resetObjects();
+        myRocket.pos.y=height/2.5;
         stage = 3;
         gameover = false;
       }
