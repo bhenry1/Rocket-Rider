@@ -17,6 +17,8 @@ PImage gameOverBackGround;
 PImage milkyWayCandyCollectable;
 PImage titleScreenBackground;
 
+PImage customImage;
+
 boolean gameover;
 boolean inMultiplayer;
 
@@ -45,6 +47,7 @@ ArrayList<SpaceObject> spaceObjects = new ArrayList<SpaceObject>();
 int candyCount;
 int smAsteroidCount;
 int medAsteroidCount;
+int customObjectCount;
 
 float speed;
 float timeInterval;
@@ -92,12 +95,13 @@ void setup()
   right2 = false;
   
   
-  size(600, 600);
+  size(800, 800);
   gameover = false;
   startTimer = new Timer(0);
   rocketFrontImage = loadImage("data/RocketFront.png");
   rocketRearImage = loadImage("data/RocketRear.png");
   
+
   
   backPos = new PVector((-width),0,1);
   offset = new PVector(0,0);
@@ -193,6 +197,17 @@ void setup()
   createSpaceObject("obstacle1",smAsteroidCount,150f,150f);
   createSpaceObject("obstacle2",medAsteroidCount,40f,60f);
   
+/**INSERT your picture here simply make the line : customImage = loadImage("myPic.png");**/
+  customImage = null;
+  //Number of Custom Objects in game.
+  customObjectCount = 0;
+  //How Wide the object is.
+  float customWidth = 0;
+  //How Tall the object is.
+  float customHeight = 0;
+  
+  //creatSpaceObject("custom_obstacle",customObjectCount,customWidth,customHeight);
+  
   
   for(int i = 0; i < stars.length; i++)
   {
@@ -264,10 +279,10 @@ void draw()
    else if(stage == 2)
   {     
     //offset.y = playerRocket1.pos.y-x;
-    //background(spaceBackGround);
+//    background(spaceBackGround);
     imageMode(CORNER);
     //backPos.x = backPos.x+(backPos.z*(offset.x/playerRocket1.pos.z));
-    //image(spaceBackGround,backPos.x,0);
+    //image(spaceBackGround,-width,0);//,backPos.x,0);
     textSize(22);
    
     startTimer.countUp();
@@ -304,9 +319,6 @@ void draw()
  
     }
     
-    setPlayerScoreLevelAndCandyText();
-    setScoreTimeInterval();
-    setLevelTimeInterval();
    /**
    UPDATE PLAYER ROCKETS
    **/
@@ -341,6 +353,12 @@ void draw()
           }
         }
      
+     /**
+     UPDATE SCORE AND GAME CLOCK
+     **/
+    setPlayerScoreLevelAndCandyText();
+    setScoreTimeInterval();
+    setLevelTimeInterval();
     //offset.x = x-playerRocket1.pos.x;
   }
   
@@ -546,13 +564,13 @@ void setPlayerScoreLevelAndCandyText()
     fill(255,255,255,255);
     text("Score:" + score , 0, 30); 
     textSize(22);
-    fill(255,255,255,255);
+    //fill(255,255,255,255);
     text("Level: " + level, 0, 50);
     textSize(22);
-    fill(255,255,255,255);
+    //fill(255,255,255,255);
     text("Candy: " + candy, 0, 70);
     textSize(22);
-    fill(255,255,255,255);
+    //fill(255,255,255,255);
     //text("Time Elapsed:" + startTimer.getTime(), width/1.65, 30);
  }
  
@@ -660,12 +678,12 @@ void setGameOverText()
         speed = 15;
       break;
       case "custom_obstacle":
-        im = milkyWayCandyCollectable;
+        im = customImage;
         tag = "obstacle";
         speed = 0;
       break;
       case "custom_collectable":
-        im = milkyWayCandyCollectable;
+        im = customImage;
         tag = "collectable";
         speed = 0;
         break;
