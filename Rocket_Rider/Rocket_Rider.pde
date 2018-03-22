@@ -88,6 +88,7 @@ int lastLane;
 
 void setup()
 {
+  //RED IS PLAYER 1, BLUE IS PLAYER 2
   inMultiplayer = true;
   left1 = false;
   left2 = false;
@@ -177,9 +178,9 @@ void setup()
   medAsteroid = loadImage("data/MedAstro.png");
   spaceBackGround = loadImage("SpaceBackground2.png");
 
-  gameOverBackGround = loadImage("GameOverScreen.png");
+  gameOverBackGround = loadImage("GameOverScreen2.png");
   milkyWayCandyCollectable = loadImage("MilkyWayCollectable.png");
-  titleScreenBackground = loadImage("title2.png");
+  titleScreenBackground = loadImage("TitleScreem.png");
 
   
   //spaceBackGround.resize(600, 600);
@@ -267,7 +268,7 @@ void draw()
 
    imageMode(CORNER);
    
-   image(titleScreenBackground, -width/5.7, height/20, 800, 600);
+   image(titleScreenBackground, width/300, height/20, 800, 800);
 
    translate(width/2, height/2);
    textFade();
@@ -294,11 +295,11 @@ void draw()
     if(secondsEllapsed < 10)
     {
       
-       text("Time Elapsed: " + minutesEllapsed + ":" + "0" + secondsEllapsed, width/1.55, 30);
+       text("Time Elapsed: " + minutesEllapsed + ":" + "0" + Math.round(secondsEllapsed), width/1.55, 30);
     }
     else
     {
-       text("Time Elapsed: " + minutesEllapsed + ":" + secondsEllapsed, width/1.55, 30);
+       text("Time Elapsed: " + minutesEllapsed + ":" + Math.round(secondsEllapsed), width/1.55, 30);
     
       if( secondsEllapsed >= 60)
       {
@@ -366,7 +367,7 @@ void draw()
   else if(stage == 3)
   {
     stage2MusicFile.stop();
-    image(gameOverBackGround, width/2, height/2, 600, 600);
+    image(gameOverBackGround, width/2, height/2, 800, 800);
     setGameOverText();
    
   }
@@ -384,6 +385,22 @@ void draw()
         {
            playerRocket2.pos.y = height/2.5;
            playerRocket2.velocity.mult(0);
+           
+             if(loser == 1)
+             {
+               fill(255);
+               textSize(70);
+               text("Player 2 wins!!!!!!", width/9, 400);
+               //System.out.println("Player 2 wins!!!!");
+             }
+             
+             else if(loser == 2)
+             {
+               fill(255);
+               textSize(70);
+               text("Player 1 wins!!!!!!", width/9, 400);
+               //System.out.println("Player 1 wins!!!!!");
+             }
         }
        
                
@@ -519,7 +536,7 @@ void setTitleText()
  //text("Rocket Rider!", -100, -250);
  fill(255,255,255,textOpacity);
  rectMode(CENTER);
- text("Press enter to ride!", -width/3.5, height/3);
+ text("Press enter to ride!", -width/4.5, height/3);
 }
 
  /*
@@ -636,14 +653,30 @@ void setLevelTimeInterval()
 void setGameOverText()
 {
     fill(255);
-    textSize(70);
-    text("YOU CRASHED!", width/9, 100);
+    textSize(60);
+    text("YOU CRASHED!", width/4, 100);
     
     fill(255);
     textSize(22);
-    text("Your score was: " + score + "\nYou were on level: " + level + "\nYou were alive for: " + minutesEllapsed + " minute(s) and " + Math.round(secondsEllapsed) + "  sec." + "\nYou collected: " + candy + " Candies", 60, height/3); 
+    text("Your score was: " + score + "\nYou were on level: " + level + "\nYou were alive for: " + minutesEllapsed + " minute(s) and " + Math.round(secondsEllapsed) + "  sec." + "\nYou collected: " + candy + " Candies", width/4, height/3); 
    
-    text("Press the spacebar to play again" , 120, 400);  
+    text("Press the spacebar to play again" , width/4, 400);  
+    
+     if(loser == 1)
+             {
+               fill(255);
+               textSize(50);
+               text("Player 2 wins!", width/4, 600);
+               //System.out.println("Player 2 wins!!!!");
+             }
+             
+             else if(loser == 2)
+             {
+               fill(255);
+               textSize(50);
+               text("Player 1 wins!", width/4, 600);
+               //System.out.println("Player 1 wins!!!!!");
+             }
 }
 
 
