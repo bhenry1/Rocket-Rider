@@ -18,9 +18,18 @@ PImage milkyWayCandyCollectable;
 PImage titleScreenBackground;
 
 boolean gameover;
+boolean inMultiplayer;
+
+boolean left1;
+boolean left2;
+boolean right1;
+boolean right2;
+color tint1;
+color tint2;
 
 
-Rocket myRocket;
+Rocket playerRocket1;
+Rocket playerRocket2;
 RocketFront front;
 RocketFront front_HollowPoint;
 RocketFront front_TankPoint;
@@ -33,9 +42,9 @@ RocketRear rear_StagStag;
 
 StarField[] stars = new StarField[800];
 ArrayList<SpaceObject> spaceObjects = new ArrayList<SpaceObject>();
-float candyCount;
-float smAsteroidCount;
-float medAsteroidCount;
+int candyCount;
+int smAsteroidCount;
+int medAsteroidCount;
 
 float speed;
 float timeInterval;
@@ -45,11 +54,13 @@ float timePast3;
 float timer4;
 
 float levelTimer = 15000;
-int keyInput;
+int keyInput1;
+char keyInput2;
 
 float x,y,z;
 PVector backPos;
 PVector  offset;
+int loser = 0;
 
 
 //score increses every half a second
@@ -74,14 +85,20 @@ int lastLane;
 
 void setup()
 {
-  //z = 1;
-  gameover = false;
-  size(600, 600);
-  startTimer = new Timer(0);
-  rocketFrontImage = loadImage("RocketFront.png");
-  rocketRearImage = loadImage("RocketRear.png");
+  inMultiplayer = true;
+  left1 = false;
+  left2 = false;
+  right1 = false;
+  right2 = false;
   
-
+  
+  size(600, 600);
+  gameover = false;
+  startTimer = new Timer(0);
+  rocketFrontImage = loadImage("data/RocketFront.png");
+  rocketRearImage = loadImage("data/RocketRear.png");
+  
+  
   backPos = new PVector((-width),0,1);
   offset = new PVector(0,0);
 
@@ -90,12 +107,34 @@ void setup()
   timePast2 = millis();
   timePast3 = millis();
   timeInterval = 750.0f;
-  keyInput = 0;
+  keyInput1 = 0;
+  keyInput2 = ' ';
   int size1 = 30;
   int size2= 30;
   
   laneCount = 10;
   lastLane = 0;
+  
+  PVector pos1 = new PVector(0,0);
+  PVector pos2 = new PVector(0,0);
+  //SETS THE CHARACTER COLORS and POSITIONS FOR MULTIPLAYER
+   if(inMultiplayer)
+  {
+     tint1 = color(255,0,0);
+     pos1.x = width/2.5;
+     pos1.y = height/2.5;
+     tint2 = color(0,0,255);
+     pos2.x = width/1.5;
+     pos2.y = height/2.5;
+  }
+  else
+  {
+     tint1 = color(255,255,255);
+     pos1.x = width/2;
+     pos1.y = height/2.5;
+     tint2 = color(255,255,255);
+  }
+  
   
   /*
   CREATE THE ROCKET BY MAKING PARTS(FRONT/REAR) and COMBINING INTO A ROCKET OBJECT
@@ -110,16 +149,28 @@ void setup()
    rear_BoomBoom = new RocketRear(20,1,new PVector(size2,size2), rocketRearImage);
    rear_PuffPuff = new RocketRear(5,8,new PVector(size2,size2), rocketRearImage);
    rear_StagStag = new RocketRear(10,10,new PVector(size2,size2), rocketRearImage);
+   
    //ROCKET IS BUILT
-   myRocket = new Rocket(width/2,height/2.5,5,front_HollowPoint,rear_BoomBoom);
+   playerRocket1 = new Rocket(pos1.x,pos1.y,5,front_GunayPoint,rear_BoomBoom);
+   
+   if(inMultiplayer)
+   {
+   playerRocket2 = new Rocket(pos2.x,pos2.y,5,front_HollowPoint,rear_BoomBoom);
+   }
+   else
+   {
+    playerRocket2 = null; 
+   }
+  
+   
   
   
   /**
   GAME IMAGES ARE DEFINED AND LOADED HERE
   **/
   
-  asteroid = loadImage("smallAstro.png");
-  medAsteroid = loadImage("MedAstro.png");
+  asteroid = loadImage("data/smallAstro.png");
+  medAsteroid = loadImage("data/MedAstro.png");
   spaceBackGround = loadImage("SpaceBackground2.png");
 
   gameOverBackGround = loadImage("GameOverScreen.png");
@@ -137,30 +188,10 @@ void setup()
   candyCount = 5;
   smAsteroidCount = 10;
   medAsteroidCount = 3;
-  for(int i = 0; i < candyCount; i++)
-  {
-    SpaceObject o = new SpaceObject(milkyWayCandyCollectable,new CollisionField(new PVector(40,20),new PVector(0,0)),"collectable");
-    o.setSpeed(8);
-    o.setGraphicScale(42,22);
-    o.setPosition(random(width),random(height,height*2)); 
-    spaceObjects.add(o);  
-  }
-  for(int i = 0; i < smAsteroidCount; i++)
-  {
-     SpaceObject o = new SpaceObject(asteroid,new CollisionField(new PVector(40,40),new PVector(0,0)),"obstacle");
-     o.setSpeed(8);
-     o.setGraphicScale(50,50);
-     o.setPosition(random(width),random(height,height*2));
-     spaceObjects.add(o);
-   }
-  for(int i = 0; i < medAsteroidCount; i++)
-  {
-   SpaceObject o = new SpaceObject(medAsteroid,new CollisionField(new PVector(40,60),new PVector(0,0)),"obstacle");
-     o.setSpeed(15);
-     o.setGraphicScale(45,75);
-     o.setPosition(random(width),random(height,height*2));
-     spaceObjects.add(o);
-  }
+  
+  createSpaceObject("collectable",candyCount,40f,20f);
+  createSpaceObject("obstacle1",smAsteroidCount,150f,150f);
+  createSpaceObject("obstacle2",medAsteroidCount,40f,60f);
   
   
   for(int i = 0; i < stars.length; i++)
@@ -204,9 +235,9 @@ void setup()
 
 void draw()
 {
-  x = myRocket.pos.x;
+  x = playerRocket1.pos.x;
   background(0);
-  //y = myRocket.pos.y;
+  //y = playerRocket1.pos.y;
   getInput();
   //Stage 1
   if(stage == 1)
@@ -216,14 +247,13 @@ void draw()
 
    //Stars start from the center of the screen
    translate(0,0);
-   //pushMatrix();
-   //Speed of the stars is maped to the player's mouseX, or mouse movent along the width of the screen
+   //Speed of the stars is mapped to the player's mouseX, or mouse movent along the width of the screen
    speed = map(mouseX, 0, width, 1, 15);
 
    imageMode(CORNER);
    
    image(titleScreenBackground, -width/5.7, height/20, 800, 600);
-   //popMatrix();
+
    translate(width/2, height/2);
    textFade();
    setTitleText();
@@ -233,10 +263,10 @@ void draw()
    //Stage 2
    else if(stage == 2)
   {     
-    //offset.y = myRocket.pos.y-x;
+    //offset.y = playerRocket1.pos.y-x;
     //background(spaceBackGround);
     imageMode(CORNER);
-    backPos.x = backPos.x+(backPos.z*(offset.x/myRocket.pos.z));
+    //backPos.x = backPos.x+(backPos.z*(offset.x/playerRocket1.pos.z));
     //image(spaceBackGround,backPos.x,0);
     textSize(22);
    
@@ -277,12 +307,41 @@ void draw()
     setPlayerScoreLevelAndCandyText();
     setScoreTimeInterval();
     setLevelTimeInterval();
+   /**
+   UPDATE PLAYER ROCKETS
+   **/
+    playerRocket1.move();
+    tint(tint1);
+    playerRocket1.display();
     
+    //CHECKS FOR MULTIPLAYER AND DISPLAYS PLAYER 2
+    if(inMultiplayer)
+    {
+    playerRocket2.move();
+    tint(tint2);
+    playerRocket2.display();
+    }
+    tint(255, 255, 255);
     updateObjects();
+    
+    /**
+    CHECK TO SEE WHICH PLAYER HAS LOST
+    **/
+      if(playerRocket1.pos.y<0)
+       {
+            gameover = true;
+            loser = 1;
+       }
+     if(inMultiplayer)
+        {
+          if(playerRocket2.pos.y<0)
+          {
+            gameover = true;
+            loser = 2;
+          }
+        }
      
-    myRocket.move();
-    myRocket.display();
-    offset.x = x-myRocket.pos.x;
+    //offset.x = x-playerRocket1.pos.x;
   }
   
   //Stage 3
@@ -299,9 +358,17 @@ void draw()
         crashSound.play();
         gameOverMusic.play();
         resetObjects();
-        myRocket.pos.y=height/2.5;
         stage = 3;
         gameover = false;
+         playerRocket1.pos.y = height/2.5;
+         playerRocket1.velocity.mult(0);
+        if(inMultiplayer)
+        {
+           playerRocket2.pos.y = height/2.5;
+           playerRocket2.velocity.mult(0);
+        }
+       
+               
       }
 }
 
@@ -309,16 +376,25 @@ void getInput()
 {
   if(stage == 2)
   {
-    if(keyPressed)
+    if(right1)
     {
-    //println(keyCode);
-    if(keyInput == RIGHT)
-    myRocket.moveRight();
-    
-    else if(keyInput == LEFT)
-    myRocket.moveLeft();
-    
-    }  
+       playerRocket1.moveRight();
+    }
+    else if (left1)
+    {
+      playerRocket1.moveLeft();
+    }
+    if(inMultiplayer)
+    {
+      if(right2)
+      {
+        playerRocket2.moveRight();
+      }
+      else if (left2)
+      {
+        playerRocket2.moveLeft();
+      }
+    }
  }
  else if(stage == 1)
  {
@@ -331,7 +407,7 @@ void getInput()
        stage = 2;
        timer4 = millis();
      }
- }
+   }
      
  else
  {
@@ -349,21 +425,68 @@ void getInput()
        candy = 0;
        timePast3 = 0;
        startTimer = new Timer(0);
-       
      }
- }
- 
+   }
 }
 void keyPressed()
 {
-   keyInput = keyCode;
+   switch(keyCode)
+  {
+    case RIGHT:
+    right1 = true;
+    break;
+    case LEFT:
+    left1 = true;
+    break;
+  }
+  if(inMultiplayer)
+  {
+    switch(key)
+    {
+      case 'd':
+      right2 = true;
+      break;
+      case 'a':
+      left2 = true;
+      break;
+    }
+  }
+   /*keyInput1 = keyCode;
+   keyInput2 = key;*/
 }
 void keyReleased()
 {
- if (keyCode == keyInput )
+  switch(keyCode)
+  {
+    case RIGHT:
+    right1 = false;
+    break;
+    case LEFT:
+    left1 = false;
+    break;
+  }
+  if(inMultiplayer)
+  {
+    switch(key)
+    {
+      case 'd':
+      right2 = false;
+      break;
+      case 'a':
+      left2 = false;
+      break;
+    }
+  }
+    
+/*  }
+ if (keyCode == keyInput1 )
  {
-   keyInput = 0;
+   keyInput1 = 0;
  }
+ if (key == keyInput2 )
+ {
+   keyInput2 = ' ';
+ }*/
 }
 
 /*
@@ -440,15 +563,11 @@ void setPlayerScoreLevelAndCandyText()
 */
 void setScoreTimeInterval()
 {
-  
-  
-  
     if(millis() > timePast + scoreInterval)
     {
        timePast = millis();
        score += scoreMultiplyer*10; 
     }
-
 }
 
 /*
@@ -490,29 +609,6 @@ void setLevelTimeInterval()
  
 }
 
-/*
-*Method Name: handleCollisions()
-*@param: None
-*DESC: This method contains the logic for obstacle collison as well as generating astroids.
-*/
-void updateObjects()
-{ 
-   for(int i = 0; i < spaceObjects.size(); i++)
-   {
-        SpaceObject o = spaceObjects.get(i);
-        o.update();
-        o.show();
-        if(o.box.isCollidingWith(myRocket.box))
-        {
-          handleCollision(o,myRocket);
-        }
-       if(o.isOffScreen())
-        {
-           setLane(o);
-          //o.setPosition(random(width),random(height,height*2));
-        }
-      }
-}
 
 /*
 *Method Name: setGameOverText()
@@ -532,6 +628,8 @@ void setGameOverText()
     text("Press the spacebar to play again" , 120, 400);  
 }
 
+
+
 /*
 *Method Name: resetObjects()
 *@param: None
@@ -539,9 +637,84 @@ void setGameOverText()
 *upon astroid collision so that when the player restarts a new game 
 *they dont immeditely collide with an astroid. 
 */
+
+ void createSpaceObject(String tag,int count,float w, float h)
+ {
+    PImage im = null;
+    float speed = 0;
+    switch(tag)
+    {
+      case "collectable":
+        im = milkyWayCandyCollectable;
+        speed = 10;
+      break;
+      case "obstacle1":
+       
+        im = asteroid;
+        tag = "obstacle";
+        speed = 10;
+      break;
+      case "obstacle2":
+        im = medAsteroid;
+        tag = "obstacle";
+        speed = 15;
+      break;
+      case "custom_obstacle":
+        im = milkyWayCandyCollectable;
+        tag = "obstacle";
+        speed = 0;
+      break;
+      case "custom_collectable":
+        im = milkyWayCandyCollectable;
+        tag = "collectable";
+        speed = 0;
+        break;
+    }
+    println(tag);
+    for(int i = 0; i < count; i++)
+    {
+      //print(im)
+      SpaceObject o = new SpaceObject(im,new CollisionField(new PVector(w-(w/3),h-(h/3)),new PVector(0,0)),tag);
+      o.setSpeed(speed);
+      o.setGraphicScale(w,h);
+      o.setPosition(random(width),random(height,height*2)); 
+      spaceObjects.add(o);  
+    }
+}
+/*
+*Method Name: handleCollisions()
+*@param: None
+*DESC: This method contains the logic for obstacle collison as well as generating astroids.
+*/
+void updateObjects()
+{ 
+  //print(spaceObjects.size());
+   for(int i = 0; i < spaceObjects.size(); i++)
+   {
+        SpaceObject o = spaceObjects.get(i);
+        o.update();
+        o.show();
+        if(o.box.isCollidingWith(playerRocket1.box))
+        {
+          handleCollision(o,playerRocket1);
+        }
+        if(inMultiplayer)
+        {
+          if(o.box.isCollidingWith(playerRocket2.box))
+          {
+            handleCollision(o,playerRocket2);
+          }
+        }
+       if(o.isOffScreen())
+        {
+           setLane(o);
+          //o.setPosition(random(width),random(height,height*2));
+        }
+      }
+}
+
 void resetObjects()
 {
-  
   for(int i = 0; i < spaceObjects.size(); i++)
       {
         SpaceObject o = spaceObjects.get(i);
@@ -566,18 +739,11 @@ void setLane(SpaceObject o)
 
 void handleCollision(SpaceObject o, Rocket r)
 {
-  
           if(o.getTag()=="obstacle")
           {
             float laneY = height/2.5;
             r.pos.y -=(laneY*(1/r.recoverForce.y));
-            println("GOT HIT");
             crashSound.play();
-            if(r.pos.y<0)
-            {
-               gameover = true;
-            }
-           //
           }
           else if(o.getTag()=="collectable")
           {
