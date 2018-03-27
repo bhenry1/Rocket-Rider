@@ -13,6 +13,9 @@ class Rocket
   int recoverCount;
   boolean inImmunity;
   int immunityCount;
+  int counter =2;
+  int t = 255;
+  boolean flash = false;
   
   float mass,speed,limit;
   
@@ -35,7 +38,7 @@ class Rocket
     this.recoverCount = 50;
     this.recoverForce = new PVector(0,this.front.defense);
     this.inImmunity = false;
-    this.immunityCount = 20;
+    this.immunityCount = 30;
   }
   
   void move()
@@ -53,7 +56,7 @@ class Rocket
     }
     else
     {
-       immunityCount = 20; 
+       immunityCount = 30; 
     }
     
     if(direction.x==0)
@@ -96,6 +99,29 @@ class Rocket
    
     front.setPosition(pos.x,pos.y+10);
     rear.setPosition(pos.x,pos.y-15);
+    if(inImmunity)
+    {
+      if(counter<=0)
+      {
+        counter = 2;
+        if(flash)
+        {
+          t = 0;
+          flash = false;
+        }
+        else
+        {
+          t = 255;
+          flash = true;
+        }
+      }
+      counter--;
+    }
+    else
+    {
+      t = 255;
+    }
+    tint(t);
     front.display();
     rear.display();
     //ellipse(pos.x,pos.y,r*2,r*2);

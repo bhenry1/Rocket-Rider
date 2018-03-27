@@ -89,7 +89,7 @@ int lastLane;
 void setup()
 {
   //RED IS PLAYER 1, BLUE IS PLAYER 2
-  inMultiplayer = false;
+  inMultiplayer = true;
   left1 = false;
   left2 = false;
   right1 = false;
@@ -136,7 +136,7 @@ void setup()
   }
   else
   {
-     tint1 = color(255,255,255);
+     tint1 = color(255,255,255,255);
      pos1.x = width/2;
      pos1.y = height/2.5;
      tint2 = color(255,255,255);
@@ -803,15 +803,17 @@ void handleCollision(SpaceObject o, Rocket r)
               r.pos.y -=(laneY*(1/r.recoverForce.y));
               crashSound.play();
               r.inImmunity = true;
+              setLane(o);
              }
           }
-          else if(o.getTag()=="collectable")
+          if(o.getTag()=="collectable")
           {
             candyCollect.play();
             candy++;
             scoreMultiplyer++;
+            setLane(o);
             //o.setPosition(random(width),random(height,height*2));
           }
-          setLane(o);
+          
        //}
 }
