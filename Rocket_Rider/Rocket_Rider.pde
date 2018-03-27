@@ -89,14 +89,13 @@ int lastLane;
 void setup()
 {
   //RED IS PLAYER 1, BLUE IS PLAYER 2
-  inMultiplayer = true;
-  left1 = false;
+  inMultiplayer =true;  left1 = false;
   left2 = false;
   right1 = false;
   right2 = false;
   
   
-  size(800, 800);
+  size(1000,800);
   gameover = false;
   startTimer = new Timer(0);
   rocketFrontImage = loadImage("data/RocketFront.png");
@@ -160,7 +159,7 @@ void setup()
    
    if(inMultiplayer)
    {
-   playerRocket2 = new Rocket(pos2.x,pos2.y,5,front_HollowPoint,rear_BoomBoom);
+   playerRocket2 = new Rocket(pos2.x,pos2.y,5,front_GunayPoint,rear_BoomBoom);
    }
    else
    {
@@ -178,7 +177,7 @@ void setup()
   medAsteroid = loadImage("data/MedAstro.png");
   spaceBackGround = loadImage("SpaceBackground2.png");
 
-  gameOverBackGround = loadImage("GameOverScreen2.png");
+  gameOverBackGround = loadImage("GameOverScreen.png");
   milkyWayCandyCollectable = loadImage("MilkyWayCollectable.png");
   titleScreenBackground = loadImage("TitleScreem.png");
 
@@ -190,13 +189,13 @@ void setup()
   /**
   CREATE THE OBJECTS FOR THE GAME AND STORE THEM IN AN ARRAY LIST
   **/
-  candyCount = 5;
-  smAsteroidCount = 10;
-  medAsteroidCount = 3;
+  candyCount = 15;
+  smAsteroidCount = 20;
+  medAsteroidCount = 6;
   
   createSpaceObject("collectable",candyCount,40f,20f);
   createSpaceObject("obstacle1",smAsteroidCount,150f,150f);
-  createSpaceObject("obstacle2",medAsteroidCount,40f,60f);
+  createSpaceObject("obstacle2",medAsteroidCount,120f,180f);
   
 /**INSERT your picture here simply make the line : customImage = loadImage("myPic.png");**/
   customImage = null;
@@ -268,7 +267,7 @@ void draw()
 
    imageMode(CORNER);
    
-   image(titleScreenBackground, width/300, height/20, 800, 800);
+   image(titleScreenBackground, width/200, height/20, 1000, 1000);
 
    translate(width/2, height/2);
    textFade();
@@ -280,7 +279,7 @@ void draw()
    else if(stage == 2)
   {     
     //offset.y = playerRocket1.pos.y-x;
-//    background(spaceBackGround);
+    //background(spaceBackGround);
     imageMode(CORNER);
     //backPos.x = backPos.x+(backPos.z*(offset.x/playerRocket1.pos.z));
     //image(spaceBackGround,-width,0);//,backPos.x,0);
@@ -307,7 +306,6 @@ void draw()
         minutesEllapsed++;
         level++;
         levelUp.play();
-
       }
       
       if(Math.round(secondsEllapsed) == 60)
@@ -386,21 +384,7 @@ void draw()
            playerRocket2.pos.y = height/2.5;
            playerRocket2.velocity.mult(0);
            
-             if(loser == 1)
-             {
-               fill(255);
-               textSize(70);
-               text("Player 2 wins!!!!!!", width/9, 400);
-               //System.out.println("Player 2 wins!!!!");
-             }
-             
-             else if(loser == 2)
-             {
-               fill(255);
-               textSize(70);
-               text("Player 1 wins!!!!!!", width/9, 400);
-               //System.out.println("Player 1 wins!!!!!");
-             }
+        
         }
        
                
@@ -550,6 +534,7 @@ void textFade()
   {
     timePast = millis();
     textFade *= -1;
+    
   }
   
   textOpacity += textFade;
@@ -612,8 +597,8 @@ void setScoreTimeInterval()
 */
 void setLevelTimeInterval()
 {
-  /*
   
+  /*
    if(millis() > timePast2 + levelTimer)
     {
       timePast2 += millis();
@@ -623,17 +608,29 @@ void setLevelTimeInterval()
     
     
     
-     float levelInterval = 30;
-     float secondLevelInterval = 30.03;
+      
+     float levelInterval = 5;
+     //float secondLevelInterval = 5.04;
+     
+     while(Math.round(secondsEllapsed) == 5 )
+     {
+       level++;
+       break;
+       
+     }
+     secondsEllapsed++;
+   
+   /*
      if((secondsEllapsed > levelInterval) && (secondsEllapsed < secondLevelInterval))
      {
       level++;
       levelUp.play();
       
-       
-      
      }
+   */
      
+     
+ 
       if(Math.round(secondsEllapsed) == levelInterval)
      {
          textSize(30);
@@ -654,29 +651,33 @@ void setGameOverText()
 {
     fill(255);
     textSize(60);
-    text("YOU CRASHED!", width/4, 100);
+    text("YOU CRASHED!", width/4, 120);
     
     fill(255);
     textSize(22);
-    text("Your score was: " + score + "\nYou were on level: " + level + "\nYou were alive for: " + minutesEllapsed + " minute(s) and " + Math.round(secondsEllapsed) + "  sec." + "\nYou collected: " + candy + " Candies", width/4, height/3); 
+    text("Your score was: " + score + "\nYou were on level: " + level + "\nYou were alive for: " + minutesEllapsed + " minute(s) and " + Math.round(secondsEllapsed) + "  sec." + "\nYou collected: " + candy + " Candies", width/4, height/3.5); 
    
-    text("Press the spacebar to play again" , width/4, 400);  
-    
-     if(loser == 1)
-             {
-               fill(255);
-               textSize(50);
-               text("Player 2 wins!", width/4, 600);
-               //System.out.println("Player 2 wins!!!!");
-             }
-             
-             else if(loser == 2)
-             {
-               fill(255);
-               textSize(50);
-               text("Player 1 wins!", width/4, 600);
-               //System.out.println("Player 1 wins!!!!!");
-             }
+    text("Press SPACE" , width/2.45, 425);  
+    text("To Ride again!" , width/2.5, 450); 
+    if(inMultiplayer)
+    {
+       if(loser == 1)
+       {
+         fill(255);
+         textSize(50);
+         text("Player 2 wins!", width/4, 350);
+         //System.out.println("Player 2 wins!!!!");
+       }
+       
+       else if(loser == 2)
+       {
+         fill(255);
+         textSize(50);
+         text("Player 1 wins!", width/4, 350);
+         //System.out.println("Player 1 wins!!!!!");
+       }
+    }
+     
 }
 
 
@@ -697,18 +698,18 @@ void setGameOverText()
     {
       case "collectable":
         im = milkyWayCandyCollectable;
-        speed = 10;
+        speed = 12;
       break;
       case "obstacle1":
        
         im = asteroid;
         tag = "obstacle";
-        speed = 10;
+        speed = 15;
       break;
       case "obstacle2":
         im = medAsteroid;
         tag = "obstacle";
-        speed = 15;
+        speed = 20;
       break;
       case "custom_obstacle":
         im = customImage;
@@ -779,10 +780,10 @@ void setLane(SpaceObject o)
      float lane = int(random(laneCount));
       while(lastLane == lane)
       {
-        lane = int(random(0,laneCount));
+        lane = int(random(1,laneCount));
       }
       lastLane = int(lane);
-      float laneX = (lane/laneCount)*width;
+      float laneX = (lane/laneCount)*width+50;
       float laneY = height*3 + ((lane/5)*height);
       //println(laneY);
       o.setPosition(laneX,random(height,laneY));   
