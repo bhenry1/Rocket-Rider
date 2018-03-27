@@ -88,14 +88,14 @@ int lastLane;
 
 void setup()
 {
-  inMultiplayer = true;
+  inMultiplayer = false;
   left1 = false;
   left2 = false;
   right1 = false;
   right2 = false;
   
   
-  size(800, 800);
+  size(600, 600);
   gameover = false;
   startTimer = new Timer(0);
   rocketFrontImage = loadImage("data/RocketFront.png");
@@ -757,11 +757,16 @@ void setLane(SpaceObject o)
 
 void handleCollision(SpaceObject o, Rocket r)
 {
+       
           if(o.getTag()=="obstacle")
           {
-            float laneY = height/2.5;
-            r.pos.y -=(laneY*(1/r.recoverForce.y));
-            crashSound.play();
+            if(!r.inImmunity)
+             {
+              float laneY = height/2.5;
+              r.pos.y -=(laneY*(1/r.recoverForce.y));
+              crashSound.play();
+              r.inImmunity = true;
+             }
           }
           else if(o.getTag()=="collectable")
           {
@@ -771,4 +776,5 @@ void handleCollision(SpaceObject o, Rocket r)
             //o.setPosition(random(width),random(height,height*2));
           }
           setLane(o);
+       //}
 }

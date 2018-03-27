@@ -11,6 +11,8 @@ class Rocket
   CollisionField box;
   boolean isMoving;
   int recoverCount;
+  boolean inImmunity;
+  int immunityCount;
   
   float mass,speed,limit;
   
@@ -32,11 +34,27 @@ class Rocket
     this.isMoving = false;
     this.recoverCount = 50;
     this.recoverForce = new PVector(0,this.front.defense);
+    this.inImmunity = false;
+    this.immunityCount = 20;
   }
   
   void move()
   {
     this.recover();
+    if(inImmunity)
+    {
+      println("IMMUNE");
+        if(immunityCount<=0)
+        {
+          println("NOT IMMUNE");
+          inImmunity = false;
+        }
+        immunityCount--;
+    }
+    else
+    {
+       immunityCount = 20; 
+    }
     
     if(direction.x==0)
     {
@@ -124,7 +142,7 @@ class Rocket
         
         //pos.y+=recoverForce.y*10;
         println("Here");
-         this.applyForce(new PVector(0,10/recoverForce.y));
+        this.applyForce(new PVector(0,10/recoverForce.y));
       }
       recoverCount = 50;
     }
