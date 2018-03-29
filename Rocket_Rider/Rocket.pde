@@ -17,12 +17,14 @@ class Rocket
   int t = 255;
   boolean flash = false;
   
+  float r,b,g;
+  
   float mass,speed,limit;
   
   //public Rocket(float x,float y, float z, float r, float speed, float tiltSpeed)
-  public Rocket(float x,float y, float z, RocketFront front, RocketRear rear)
+  public Rocket(RocketFront front, RocketRear rear)
   {
-    this.pos = new PVector(x,y,z);
+    this.pos = new PVector(0,0,0);
     this.front = front;
     this.rear = rear;
     this.acceleration = new PVector(0,0);
@@ -39,8 +41,24 @@ class Rocket
     this.recoverForce = new PVector(0,this.front.defense);
     this.inImmunity = false;
     this.immunityCount = 30;
+    r = 255;
+    g = 255;
+    b = 255;
   }
   
+  void setPosition(float x, float y, float z)
+  {
+    this.pos.x = x;
+    this.pos.y = y;
+    this.pos.z = z;
+  }
+  
+  void setColor(float red, float green, float blue )
+  {
+    r = red;
+    b = blue;
+    g = green;
+  }
   void move()
   {
     this.recover();
@@ -121,7 +139,7 @@ class Rocket
     {
       t = 255;
     }
-    tint(t);
+    tint(r,g,b,t);
     front.display();
     rear.display();
     //ellipse(pos.x,pos.y,r*2,r*2);
@@ -167,7 +185,7 @@ class Rocket
       {
         
         //pos.y+=recoverForce.y*10;
-        println("Here");
+        //println("Here");
         this.applyForce(new PVector(0,10/recoverForce.y));
       }
       recoverCount = 50;

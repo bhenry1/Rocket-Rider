@@ -29,15 +29,14 @@ boolean right2;
 color tint1;
 color tint2;
 
-
 Rocket playerRocket1;
 Rocket playerRocket2;
-RocketFront front;
+RocketFront front_Custom;
 RocketFront front_HollowPoint;
 RocketFront front_TankPoint;
 RocketFront front_GunayPoint;
 
-RocketRear rear;
+RocketRear rear_Custom;
 RocketRear rear_BoomBoom;
 RocketRear rear_PuffPuff;
 RocketRear rear_StagStag;
@@ -67,14 +66,14 @@ int loser = 0;
 
 
 //score increses every half a second
-float scoreInterval = 500;
+//float scoreInterval = 500;
 
 float timeAlive = 0;
 int stage = 1;
 int textOpacity = 100;
 int textFade = 2;
-int score = 0;
-int scoreMultiplyer = 1;
+//int score = 0;
+//int scoreMultiplyer = 1;
 int level = 1;
 int candy = 0;
 float secondsEllapsed = 0;
@@ -89,7 +88,7 @@ int lastLane;
 void setup()
 {
   //RED IS PLAYER 1, BLUE IS PLAYER 2
-  inMultiplayer = true;
+  inMultiplayer = false;
   left1 = false;
   left2 = false;
   right1 = false;
@@ -97,14 +96,12 @@ void setup()
   
   
 
-  size(1000,800);
+  size(800,800);
 
   gameover = false;
   startTimer = new Timer(0);
   rocketFrontImage = loadImage("data/RocketFront.png");
   rocketRearImage = loadImage("data/RocketRear.png");
-  
-
   
   backPos = new PVector((-width),0,1);
   offset = new PVector(0,0);
@@ -118,7 +115,6 @@ void setup()
   keyInput2 = ' ';
   int size1 = 30;
   int size2= 30;
-  
   laneCount = 10;
   lastLane = 0;
   
@@ -141,28 +137,38 @@ void setup()
      pos1.y = height/2.5;
      tint2 = color(255,255,255);
   }
+  //FRONT VARIABLES  Defense(How much damage can your rocket take) , Size(The size of the rocket)
+  float defense = 0;
+  PVector frontSize = new PVector(0,0);
+  //REAR VARIABLES  ThrustSpeed(How fast the rocket accelerates), SpeedLimit(Max speed of the rocket) , Size
+  float thrustSpeed =0;
+  float speedLimit = 0;
+  PVector rearSize = new PVector(0,0);
   
-  
-  /*
-  CREATE THE ROCKET BY MAKING PARTS(FRONT/REAR) and COMBINING INTO A ROCKET OBJECT
-  */
+  /*CREATE THE ROCKET BY MAKING PARTS(FRONT/REAR) and COMBINING INTO A ROCKET OBJECT*/
   //Front rocket parameters: Defense(How much damage can your rocket take) , Size(The size of the rocket)
-  front_HollowPoint = new RocketFront(1,new PVector(size1,size1), rocketFrontImage);
-  front_GunayPoint = new RocketFront(2.5,new PVector(size1,size1), rocketFrontImage);
-  front_TankPoint = new RocketFront(5,new PVector(size1,size1), rocketFrontImage);
- 
+  front_HollowPoint   = new RocketFront(1,new PVector(size1,size1), rocketFrontImage);
+  front_GunayPoint    = new RocketFront(2.5,new PVector(size1,size1), rocketFrontImage);
+  front_TankPoint     = new RocketFront(5,new PVector(size1,size1), rocketFrontImage);
+  //front_Custom = new RocketFront(defense,frontSize);
   
   //Rear Rocket parameters: ThrustSpeed, SpeedLimit , Size
    rear_BoomBoom = new RocketRear(20,1,new PVector(size2,size2), rocketRearImage);
    rear_PuffPuff = new RocketRear(5,8,new PVector(size2,size2), rocketRearImage);
    rear_StagStag = new RocketRear(10,10,new PVector(size2,size2), rocketRearImage);
+   //rear_Custom = new RocketFront(thrustSpeed,speedLimit,rearSize);
    
    //ROCKET IS BUILT
-   playerRocket1 = new Rocket(pos1.x,pos1.y,5,front_GunayPoint,rear_BoomBoom);
+   playerRocket1 = new Rocket(front_GunayPoint,rear_BoomBoom);
+   playerRocket1.setPosition(pos1.x,pos1.y,0);
+   playerRocket1.setColor(255,255,255);
    
    if(inMultiplayer)
    {
-   playerRocket2 = new Rocket(pos2.x,pos2.y,5,front_GunayPoint,rear_BoomBoom);
+   playerRocket2 = new Rocket(front_GunayPoint,rear_BoomBoom);
+   playerRocket1.setPosition(pos2.x,pos2.y,0);
+   playerRocket1.setColor(255,0,0);
+   playerRocket2.setColor(0,0,255);
    }
    else
    {
@@ -192,8 +198,8 @@ void setup()
   /**
   CREATE THE OBJECTS FOR THE GAME AND STORE THEM IN AN ARRAY LIST
   **/
-  candyCount = 15;
-  smAsteroidCount = 20;
+  candyCount = 5;
+  smAsteroidCount = 10;
   medAsteroidCount = 6;
   
   createSpaceObject("collectable",candyCount,40f,20f);
@@ -209,7 +215,7 @@ void setup()
   //How Tall the object is.
   float customHeight = 0;
   
-  //creatSpaceObject("custom_obstacle",customObjectCount,customWidth,customHeight);
+  //createSpaceObject("custom_obstacle",customObjectCount,customWidth,customHeight);
   
   
   for(int i = 0; i < stars.length; i++)
@@ -268,9 +274,10 @@ void draw()
    //Speed of the stars is mapped to the player's mouseX, or mouse movent along the width of the screen
    speed = map(mouseX, 0, width, 1, 15);
 
-   imageMode(CORNER);
+   imageMode(CENTER);
    
-   image(titleScreenBackground, width/200, height/20, 1000, 1000);
+   
+   image(titleScreenBackground, width/2, height/2, width, height);//*(width/width));
 
    translate(width/2, height/2);
    textFade();
@@ -297,7 +304,7 @@ void draw()
     if(secondsEllapsed < 10)
     {
       
-       text("Time Elapsed: " + minutesEllapsed + ":" + "0" + Math.round(secondsEllapsed), width/1.55, 30);
+       text("Time Elapsed: " + minutesEllapsed + ":" + "0" + Math.round(secondsEllapsed), width/2.5, height/10);
     }
     else
     {
@@ -325,14 +332,14 @@ void draw()
    UPDATE PLAYER ROCKETS
    **/
     playerRocket1.move();
-    tint(tint1);
+    //tint(tint1);
     playerRocket1.display();
     
     //CHECKS FOR MULTIPLAYER AND DISPLAYS PLAYER 2
     if(inMultiplayer)
     {
     playerRocket2.move();
-    tint(tint2);
+    //tint(tint2);
     playerRocket2.display();
     }
     tint(255, 255, 255);
@@ -358,9 +365,9 @@ void draw()
      /**
      UPDATE SCORE AND GAME CLOCK
      **/
-    setPlayerScoreLevelAndCandyText();
-    setScoreTimeInterval();
-    setLevelTimeInterval();
+    //setPlayerScoreLevelAndCandyText();
+    //setScoreTimeInterval();
+    //setLevelTimeInterval();
     //offset.x = x-playerRocket1.pos.x;
   }
   
@@ -368,7 +375,7 @@ void draw()
   else if(stage == 3)
   {
     stage2MusicFile.stop();
-    image(gameOverBackGround, width/2, height/2, 800, 800);
+    image(gameOverBackGround, width/2, height/2, width, height);
     setGameOverText();
    
   }
@@ -386,7 +393,7 @@ void draw()
         {
            playerRocket2.pos.y = height/2.5;
            playerRocket2.velocity.mult(0);
-           
+        
         
         }
        
@@ -440,8 +447,8 @@ void getInput()
        gameOverMusic.stop();
        musicFile.loop();
        minutesEllapsed = 0;
-       score = 0;
-       scoreMultiplyer = 1;
+       //score = 0;
+       //scoreMultiplyer = 1;
        level = 1;
        stage = 1;
        candy = 0;
@@ -563,7 +570,7 @@ void displayStars()
 *@param: None
 *DESC: This method sets the score, level, and candy text at the top left of the screen
 */
-void setPlayerScoreLevelAndCandyText()
+/*void setPlayerScoreLevelAndCandyText()
 {
     textSize(22);  
     fill(255,255,255,255);
@@ -577,21 +584,21 @@ void setPlayerScoreLevelAndCandyText()
     textSize(22);
     //fill(255,255,255,255);
     //text("Time Elapsed:" + startTimer.getTime(), width/1.65, 30);
- }
+ }*/
  
  /*
 *Method Name: setScoreTimeInterval()
 *@param: None
 *DESC: This method increments the "score text interval by 10 every half a second
 */
-void setScoreTimeInterval()
+/*void setScoreTimeInterval()
 {
     if(millis() > timePast + scoreInterval)
     {
        timePast = millis();
        score += scoreMultiplyer*10; 
     }
-}
+}*/
 
 /*
 *Method Name: setLevelTimeInterval()
@@ -655,11 +662,11 @@ void setGameOverText()
     fill(255);
     textSize(60);
     text("YOU CRASHED!", width/4, 120);
-    
-    fill(255);
     textSize(22);
-    text("Your score was: " + score + "\nYou were on level: " + level + "\nYou were alive for: " + minutesEllapsed + " minute(s) and " + Math.round(secondsEllapsed) + "  sec." + "\nYou collected: " + candy + " Candies", width/4, height/3.5); 
+    /*fill(255);
    
+    text("Your score was: " + score + "\nYou were on level: " + level + "\nYou were alive for: " + minutesEllapsed + " minute(s) and " + Math.round(secondsEllapsed) + "  sec." + "\nYou collected: " + candy + " Candies", width/4, height/3.5); 
+   */
     text("Press SPACE" , width/2.45, 425);  
     text("To Ride again!" , width/2.5, 450); 
     if(inMultiplayer)
@@ -703,12 +710,13 @@ void setGameOverText()
         im = milkyWayCandyCollectable;
         speed = 12;
       break;
+      //SET ATTRIBUTES OF REGULAR ASTEROID
       case "obstacle1":
-       
         im = asteroid;
         tag = "obstacle";
         speed = 15;
       break;
+      //SET ATTRIBUTES OF MEDIUM ASTEROID
       case "obstacle2":
         im = medAsteroid;
         tag = "obstacle";
@@ -809,8 +817,8 @@ void handleCollision(SpaceObject o, Rocket r)
           if(o.getTag()=="collectable")
           {
             candyCollect.play();
-            candy++;
-            scoreMultiplyer++;
+            //candy++;
+            //scoreMultiplyer++;
             setLane(o);
             //o.setPosition(random(width),random(height,height*2));
           }
