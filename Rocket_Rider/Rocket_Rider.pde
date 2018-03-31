@@ -63,6 +63,7 @@ float x,y,z;
 PVector backPos;
 PVector  offset;
 int loser = 0;
+int collider = 0;
 
 
 //score increses every half a second
@@ -75,7 +76,8 @@ int textFade = 2;
 //int score = 0;
 //int scoreMultiplyer = 1;
 int level = 1;
-int candy = 0;
+int candy1 = 0;
+int candy2 = 0;
 float secondsEllapsed = 0;
 int minutesEllapsed = 0;
 Timer startTimer;
@@ -166,7 +168,7 @@ void setup()
    if(inMultiplayer)
    {
    playerRocket2 = new Rocket(front_GunayPoint,rear_BoomBoom);
-   playerRocket1.setPosition(pos2.x,pos2.y,0);
+   playerRocket2.setPosition(pos2.x,pos2.y,0);
    playerRocket1.setColor(255,0,0);
    playerRocket2.setColor(0,0,255);
    }
@@ -238,6 +240,7 @@ void setup()
   
   candyCollect = new SoundFile(this, "candyget.mp3");
   candyCollect.amp(0.3);
+  candyCollect.rate(3);
   
   gameOverMusic = new SoundFile(this, "gameover.mp3");
   gameOverMusic.amp(0.5);
@@ -293,40 +296,8 @@ void draw()
     imageMode(CORNER);
     //backPos.x = backPos.x+(backPos.z*(offset.x/playerRocket1.pos.z));
     //image(spaceBackGround,-width,0);//,backPos.x,0);
-    textSize(22);
-   
-    startTimer.countUp();
-    fill(255);
-    secondsEllapsed = startTimer.getTime();
-
-   
-    
-    if(secondsEllapsed < 10)
-    {
-      
-       text("Time Elapsed: " + minutesEllapsed + ":" + "0" + Math.round(secondsEllapsed), width/2.5, height/10);
-    }
-    else
-    {
-       text("Time Elapsed: " + minutesEllapsed + ":" + Math.round(secondsEllapsed), width/1.55, 30);
-    
-      if( secondsEllapsed >= 60)
-      {
-        startTimer = new Timer(0);
-        minutesEllapsed++;
-        level++;
-        levelUp.play();
-      }
-      
-      if(Math.round(secondsEllapsed) == 60)
-     {
-         textSize(30);
-         text("level: " + level, width/1.55, height/2); 
-     }
-        
-      
  
-    }
+    //}
     
    /**
    UPDATE PLAYER ROCKETS
@@ -362,13 +333,9 @@ void draw()
           }
         }
      
-     /**
-     UPDATE SCORE AND GAME CLOCK
-     **/
-    //setPlayerScoreLevelAndCandyText();
-    //setScoreTimeInterval();
-    //setLevelTimeInterval();
-    //offset.x = x-playerRocket1.pos.x;
+     /**UPDATE SCORE AND GAME CLOCK **/
+    displayInGameText();
+
   }
   
   //Stage 3
@@ -376,29 +343,26 @@ void draw()
   {
     stage2MusicFile.stop();
     image(gameOverBackGround, width/2, height/2, width, height);
-    setGameOverText();
+    displayGameOverText();
    
   }
   
    if(gameover)
+    {
+      crashSound.play();
+      gameOverMusic.play();
+      resetObjects();
+      stage = 3;
+      gameover = false;
+       playerRocket1.pos.y = height/2.5;
+       playerRocket1.velocity.mult(0);
+      if(inMultiplayer)
       {
-        crashSound.play();
-        gameOverMusic.play();
-        resetObjects();
-        stage = 3;
-        gameover = false;
-         playerRocket1.pos.y = height/2.5;
-         playerRocket1.velocity.mult(0);
-        if(inMultiplayer)
-        {
-           playerRocket2.pos.y = height/2.5;
-           playerRocket2.velocity.mult(0);
-        
-        
-        }
-       
-               
+       playerRocket2.pos.y = height/2.5;
+       playerRocket2.velocity.mult(0);
+      
       }
+    }
 }
 
 void getInput()
@@ -451,7 +415,8 @@ void getInput()
        //scoreMultiplyer = 1;
        level = 1;
        stage = 1;
-       candy = 0;
+       candy1 = 0;
+       candy2 = 0;
        timePast3 = 0;
        startTimer = new Timer(0);
      }
@@ -480,8 +445,6 @@ void keyPressed()
       break;
     }
   }
-   /*keyInput1 = keyCode;
-   keyInput2 = key;*/
 }
 void keyReleased()
 {
@@ -566,40 +529,52 @@ void displayStars()
 }
 
  /*
-*Method Name: setPlayerScoreLevelAndCandyText()
+*Method Name: displayInGameText()
 *@param: None
-*DESC: This method sets the score, level, and candy text at the top left of the screen
+*DESC: This method displays the score, level, and candy text at the top left of the screen
 */
-/*void setPlayerScoreLevelAndCandyText()
+void displayInGameText()
 {
     textSize(22);  
     fill(255,255,255,255);
-    text("Score:" + score , 0, 30); 
+    //text("Score:" + score , 0, 30); 
+    //textSize(22);
+    //fill(255,255,255,255);
+    text("Level: " + level, int(width/12), height/15);
     textSize(22);
     //fill(255,255,255,255);
-    text("Level: " + level, 0, 50);
-    textSize(22);
-    //fill(255,255,255,255);
-    text("Candy: " + candy, 0, 70);
+    text("Player 1 Candy: " + candy1, int(width/12), height/10);
+    if(inMultiplayer)
+    {
+      text("Player 2 Candy: " + candy2, int(width/12), height/7);
+    }
     textSize(22);
     //fill(255,255,255,255);
     //text("Time Elapsed:" + startTimer.getTime(), width/1.65, 30);
- }*/
  
- /*
-*Method Name: setScoreTimeInterval()
-*@param: None
-*DESC: This method increments the "score text interval by 10 every half a second
-*/
-/*void setScoreTimeInterval()
-{
-    if(millis() > timePast + scoreInterval)
-    {
-       timePast = millis();
-       score += scoreMultiplyer*10; 
-    }
-}*/
+    startTimer.countUp();
+    fill(255);
+    secondsEllapsed = startTimer.getTime();
 
+       text("Time Elapsed: " + minutesEllapsed + ":" + Math.round(secondsEllapsed), width -(width/3), height/15);
+    
+      if( secondsEllapsed >= 60)
+      {
+        startTimer = new Timer(0);
+        minutesEllapsed++;
+        level++;
+        levelUp.play();
+      }
+      
+      if(Math.round(secondsEllapsed) == 60)
+     {
+         textSize(30);
+         text("level: " + level, width/1.55, height/2); 
+     }
+        
+      
+ }
+ 
 /*
 *Method Name: setLevelTimeInterval()
 *@param: None
@@ -615,9 +590,6 @@ void setLevelTimeInterval()
       level++; 
     }
     */
-    
-    
-    
       
      float levelInterval = 5;
      //float secondLevelInterval = 5.04;
@@ -639,8 +611,6 @@ void setLevelTimeInterval()
      }
    */
      
-     
- 
       if(Math.round(secondsEllapsed) == levelInterval)
      {
          textSize(30);
@@ -653,11 +623,11 @@ void setLevelTimeInterval()
 
 
 /*
-*Method Name: setGameOverText()
+*Method Name: displayGameOverText()
 *@param: None
 *DESC: This method sets the text the player sees at the game over screen.
 */
-void setGameOverText()
+void displayGameOverText()
 {
     fill(255);
     textSize(60);
@@ -759,19 +729,21 @@ void updateObjects()
         o.show();
         if(o.box.isCollidingWith(playerRocket1.box))
         {
+          collider = 1;
           handleCollision(o,playerRocket1);
         }
         if(inMultiplayer)
         {
           if(o.box.isCollidingWith(playerRocket2.box))
           {
+            collider = 2;
             handleCollision(o,playerRocket2);
           }
         }
+        collider =0;
        if(o.isOffScreen())
         {
            setLane(o);
-          //o.setPosition(random(width),random(height,height*2));
         }
       }
 }
@@ -782,7 +754,6 @@ void resetObjects()
       {
         SpaceObject o = spaceObjects.get(i);
         setLane(o);
-       // o.setPosition(random(width),random(height,height*2));
       }
 }
 
@@ -802,7 +773,6 @@ void setLane(SpaceObject o)
 
 void handleCollision(SpaceObject o, Rocket r)
 {
-       
           if(o.getTag()=="obstacle")
           {
             if(!r.inImmunity)
@@ -817,11 +787,10 @@ void handleCollision(SpaceObject o, Rocket r)
           if(o.getTag()=="collectable")
           {
             candyCollect.play();
-            //candy++;
-            //scoreMultiplyer++;
+            if(collider ==1)
+              candy1++;
+            else if(collider ==2)
+              candy2++;
             setLane(o);
-            //o.setPosition(random(width),random(height,height*2));
           }
-          
-       //}
 }
