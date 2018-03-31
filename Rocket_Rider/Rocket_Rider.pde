@@ -17,6 +17,18 @@ PImage gameOverBackGround;
 PImage milkyWayCandyCollectable;
 PImage titleScreenBackground;
 
+PImage back1;
+PImage back2;
+PImage back3;
+PImage back4;
+PImage back5;
+PImage frame1;
+PImage frame2;
+PImage frame3;
+int imageIndex = 2;
+
+PImage[] backImages = new PImage[5];
+
 PImage customImage;
 
 boolean gameover;
@@ -60,7 +72,9 @@ int keyInput1;
 char keyInput2;
 
 float x,y,z;
-PVector backPos;
+PVector backPos1;
+PVector backPos2;
+PVector backPos3;
 PVector  offset;
 int loser = 0;
 int collider = 0;
@@ -72,7 +86,7 @@ int collider = 0;
 float timeAlive = 0;
 int stage = 1;
 int textOpacity = 100;
-int textFade = 2;
+int textFadeRate = 2;
 //int score = 0;
 //int scoreMultiplyer = 1;
 int level = 1;
@@ -98,14 +112,16 @@ void setup()
   
   
 
-  size(800,800);
+  size(600,600);
 
   gameover = false;
   startTimer = new Timer(0);
   rocketFrontImage = loadImage("data/RocketFront.png");
   rocketRearImage = loadImage("data/RocketRear.png");
   
-  backPos = new PVector((-width),0,1);
+  backPos1 = new PVector(width/2,0);
+  backPos2 = new PVector(width/2,height/2);
+  backPos3 = new PVector(width/2,height);
   offset = new PVector(0,0);
 
   font = loadFont("Stencil-48.vlw");
@@ -191,6 +207,24 @@ void setup()
   gameOverBackGround = loadImage("GameOverScreen.png");
   milkyWayCandyCollectable = loadImage("MilkyWayCollectable.png");
   titleScreenBackground = loadImage("TitleScreem.png");
+  
+  back1 = loadImage("back1.png");
+  back2 = loadImage("back2.png");
+  back3 = loadImage("back3.png");
+  back4 = loadImage("back4.png");
+  back5 = loadImage("back5.png");
+  
+  backImages[0] = back1;
+  backImages[1] = back2;
+  backImages[2] = back3;
+  backImages[3] = back4;
+  backImages[4] = back5;
+  
+  frame1 = back1;
+  frame2 = back2;
+  frame3 = back3;
+  
+  
 
   
   //spaceBackGround.resize(600, 600);
@@ -294,6 +328,7 @@ void draw()
     //offset.y = playerRocket1.pos.y-x;
     //background(spaceBackGround);
     imageMode(CORNER);
+    displayBackground();
     //backPos.x = backPos.x+(backPos.z*(offset.x/playerRocket1.pos.z));
     //image(spaceBackGround,-width,0);//,backPos.x,0);
  
@@ -506,11 +541,11 @@ void textFade()
   if(millis() > timeInterval + timePast)
   {
     timePast = millis();
-    textFade *= -1;
+    textFadeRate *= -1;
     
   }
   
-  textOpacity += textFade;
+  textOpacity += textFadeRate;
 }
 
  /*
@@ -793,4 +828,39 @@ void handleCollision(SpaceObject o, Rocket r)
               candy2++;
             setLane(o);
           }
+}
+
+void displayBackground()
+{
+  imageMode(CENTER);
+  image(frame1,backPos1.x,backPos1.y,width,height/2);
+  image(frame2,backPos2.x,backPos2.y,width,height/2);
+  image(frame3,backPos3.x,backPos3.y,width,height/2);
+  backPos1.y-=2;
+  backPos2.y-=2;
+  backPos3.y-=2;
+  if(imageIndex ==5)
+  {
+    imageIndex = 0;
+  }
+  if(backPos1.y<=(-height/4))
+  {
+   frame1 = backImages[imageIndex];
+   backPos1.y = height+(height/4);
+   imageIndex++;
+  }
+   if(backPos2.y<=(-height/4))
+  {
+   frame2 = backImages[imageIndex];
+   backPos2.y = height+(height/4);
+   imageIndex++;
+  }
+   if(backPos3.y<=(-height/4))
+  {
+   frame3 = backImages[imageIndex];
+   backPos3.y = height+(height/4);
+   imageIndex++;
+  }
+  
+  
 }
