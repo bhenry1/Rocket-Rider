@@ -110,7 +110,7 @@ int lastLane;
 void setup()
 {
   //RED IS PLAYER 1, BLUE IS PLAYER 2
-  inMultiplayer = false;
+  inMultiplayer = true;
   left1 = false;
   left2 = false;
   right1 = false;
@@ -246,8 +246,8 @@ void setup()
   CREATE THE OBJECTS FOR THE GAME AND STORE THEM IN AN ARRAY LIST
   **/
   candyCount = 5;
-  smAsteroidCount = 10;
-  medAsteroidCount = 6;
+  smAsteroidCount = 5;
+  medAsteroidCount = 3;
   
   createSpaceObject("collectable",candyCount,40f,20f);
   createSpaceObject("obstacle1",smAsteroidCount,100f,100f);
@@ -602,7 +602,7 @@ void displayInGameText()
     fill(255);
     secondsEllapsed = startTimer.getTime();
 
-       text("Time Elapsed: " + minutesEllapsed + ":" + Math.round(secondsEllapsed), width -(width/3), height/15);
+       text("Time Elapsed: " + minutesEllapsed + ":" + Math.round(secondsEllapsed), width -(width/2.6), height/15);
     
       if( secondsEllapsed >= 60)
       {
@@ -675,33 +675,47 @@ void setLevelTimeInterval()
 */
 void displayGameOverText()
 {
-    fill(255);
-    textSize(60);
-    text("YOU CRASHED!", width/4, 120);
-    textSize(22);
+    
+
     /*fill(255);
    
     text("Your score was: " + score + "\nYou were on level: " + level + "\nYou were alive for: " + minutesEllapsed + " minute(s) and " + Math.round(secondsEllapsed) + "  sec." + "\nYou collected: " + candy + " Candies", width/4, height/3.5); 
    */
-    text("Press SPACE" , width/2.45, 425);  
-    text("To Ride again!" , width/2.5, 450); 
+    textSize(30);
+    text("Press SPACE" , width/3, 375);  
+    text("To Ride again!" , width/3, 400); 
     if(inMultiplayer)
     {
        if(loser == 1)
        {
          fill(255);
+         textSize(22);
+         text("Player 2 collected:" + candy2 + " candies", width/4.5, 250);
          textSize(50);
-         text("Player 2 wins!", width/4, 350);
+         text("Player 2 wins!", width/4, height/15);
          //System.out.println("Player 2 wins!!!!");
        }
        
        else if(loser == 2)
        {
          fill(255);
+         textSize(22);
+         text("Player 1 collected:" + candy1 + " candies", width/4.5, 250);
          textSize(50);
-         text("Player 1 wins!", width/4, 350);
+         text("Player 1 wins!", width/4, height/15);
          //System.out.println("Player 1 wins!!!!!");
        }
+       
+    }
+       
+       else
+    {   
+    fill(255);
+    textSize(50);
+    text("YOU CRASHED!", width/4, height/15);
+    textSize(22);
+    text("You collected: " + candy1 + " Candies", width/4, 250);
+    text("You were alive for: \n" + minutesEllapsed + " Minutes and "  + Math.round(secondsEllapsed) + " seconds", width/4, 300);
     }
      
 }
