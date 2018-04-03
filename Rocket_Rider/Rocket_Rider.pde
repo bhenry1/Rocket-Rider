@@ -12,10 +12,16 @@ PImage medAsteroid;
 PFont font;
 PImage spaceBackGround;
 PImage rocketFrontImage;
+PImage rocketFrontImage2;
+PImage rocketFrontImage3;
 PImage rocketRearImage; 
+PImage rocketRearImage2;
+PImage rocketRearImage3;
 PImage gameOverBackGround;
 PImage milkyWayCandyCollectable;
 PImage titleScreenBackground;
+
+
 
 PImage back1;
 PImage back2;
@@ -117,7 +123,12 @@ void setup()
   gameover = false;
   startTimer = new Timer(0);
   rocketFrontImage = loadImage("data/RocketFront.png");
+  rocketFrontImage2 = loadImage("data/RocketFront2.png");
+  rocketFrontImage3 = loadImage("data/RocketFront3.png");
+  
   rocketRearImage = loadImage("data/RocketRear.png");
+  rocketRearImage2 = loadImage("data/RocketRear2.png");
+  rocketRearImage3 = loadImage("data/RocketRear3.png");
   
   backPos1 = new PVector(width/2,0);
   backPos2 = new PVector(width/2,height/2);
@@ -166,18 +177,18 @@ void setup()
   /*CREATE THE ROCKET BY MAKING PARTS(FRONT/REAR) and COMBINING INTO A ROCKET OBJECT*/
   //Front rocket parameters: Defense(How much damage can your rocket take) , Size(The size of the rocket)
   front_HollowPoint   = new RocketFront(1,new PVector(size1,size1), rocketFrontImage);
-  front_GunayPoint    = new RocketFront(2.5,new PVector(size1,size1), rocketFrontImage);
-  front_TankPoint     = new RocketFront(5,new PVector(size1,size1), rocketFrontImage);
+  front_GunayPoint    = new RocketFront(2.5,new PVector(size1,size1), rocketFrontImage2);
+  front_TankPoint     = new RocketFront(5,new PVector(size1,size1), rocketFrontImage3);
   //front_Custom = new RocketFront(defense,frontSize);
   
   //Rear Rocket parameters: ThrustSpeed, SpeedLimit , Size
-   rear_BoomBoom = new RocketRear(20,1,new PVector(size2,size2), rocketRearImage);
+   rear_BoomBoom = new RocketRear(20,1,new PVector(size2,size2), rocketRearImage3);
    rear_PuffPuff = new RocketRear(5,8,new PVector(size2,size2), rocketRearImage);
-   rear_StagStag = new RocketRear(10,10,new PVector(size2,size2), rocketRearImage);
+   rear_StagStag = new RocketRear(10,10,new PVector(size2,size2), rocketRearImage2);
    //rear_Custom = new RocketFront(thrustSpeed,speedLimit,rearSize);
    
    //ROCKET IS BUILT
-   playerRocket1 = new Rocket(front_GunayPoint,rear_BoomBoom);
+   playerRocket1 = new Rocket(front_TankPoint,rear_StagStag);
    playerRocket1.setPosition(pos1.x,pos1.y,0);
    playerRocket1.setColor(255,255,255);
    
@@ -206,7 +217,7 @@ void setup()
 
   gameOverBackGround = loadImage("GameOverScreen.png");
   milkyWayCandyCollectable = loadImage("MilkyWayCollectable.png");
-  titleScreenBackground = loadImage("TitleScreem.png");
+  titleScreenBackground = loadImage("title.png");
   
   back1 = loadImage("back1.png");
   back2 = loadImage("back2.png");
@@ -239,8 +250,8 @@ void setup()
   medAsteroidCount = 6;
   
   createSpaceObject("collectable",candyCount,40f,20f);
-  createSpaceObject("obstacle1",smAsteroidCount,150f,150f);
-  createSpaceObject("obstacle2",medAsteroidCount,120f,180f);
+  createSpaceObject("obstacle1",smAsteroidCount,100f,100f);
+  createSpaceObject("obstacle2",medAsteroidCount,80f,120f);
   
 /**INSERT your picture here simply make the line : customImage = loadImage("myPic.png");**/
   customImage = null;

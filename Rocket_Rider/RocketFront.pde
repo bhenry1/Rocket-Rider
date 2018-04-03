@@ -26,6 +26,6 @@ class RocketFront
   {
     fill(c);
     imageMode(CENTER);
-    image(rocketFrontImage, pos.x,pos.y,93/6,387/6);
+    image(rocketFrontImage, pos.x,pos.y, rocketFrontImage.width/6,rocketFrontImage.height/6);
   }
 }

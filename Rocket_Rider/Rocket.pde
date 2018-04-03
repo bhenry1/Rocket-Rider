@@ -115,8 +115,8 @@ class Rocket
     fill(255);
    
    
-    front.setPosition(pos.x,pos.y+10);
-    rear.setPosition(pos.x,pos.y-15);
+    front.setPosition(pos.x,pos.y+20);
+    rear.setPosition(pos.x,pos.y-16);
     if(inImmunity)
     {
       if(counter<=0)
