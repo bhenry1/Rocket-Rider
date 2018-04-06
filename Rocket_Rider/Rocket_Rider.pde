@@ -110,7 +110,7 @@ int lastLane;
 void setup()
 {
   //RED IS PLAYER 1, BLUE IS PLAYER 2
-  inMultiplayer = false;
+  inMultiplayer = true;
   left1 = false;
   left2 = false;
   right1 = false;
@@ -482,12 +482,14 @@ void keyPressed()
   }
   if(inMultiplayer)
   {
-    switch(key)
+    switch(keyCode)
     {
-      case 'd':
+      //case 'd':
+      case UP :
       right2 = true;
       break;
-      case 'a':
+      //case 'a':
+      case DOWN :
       left2 = true;
       break;
     }
@@ -506,12 +508,14 @@ void keyReleased()
   }
   if(inMultiplayer)
   {
-    switch(key)
+    switch(keyCode)
     {
-      case 'd':
+      //case 'd':
+      case UP :
       right2 = false;
       break;
-      case 'a':
+      //case 'a':
+      case DOWN :
       left2 = false;
       break;
     }
