@@ -31,7 +31,7 @@ PImage back5;
 PImage frame1;
 PImage frame2;
 PImage frame3;
-int imageIndex = 2;
+int imageIndex = 5;
 
 PImage[] backImages = new PImage[5];
 
@@ -110,7 +110,7 @@ int lastLane;
 void setup()
 {
   //RED IS PLAYER 1, BLUE IS PLAYER 2
-  inMultiplayer = true;
+  inMultiplayer = false;
   left1 = false;
   left2 = false;
   right1 = false;
@@ -231,9 +231,9 @@ void setup()
   backImages[3] = back4;
   backImages[4] = back5;
   
-  frame1 = back1;
-  frame2 = back2;
-  frame3 = back3;
+  frame1 = back3;
+  frame2 = back4;
+  frame3 = back5;
   
   
 
@@ -249,25 +249,26 @@ void setup()
   smAsteroidCount = 5;
   medAsteroidCount = 3;
   
-  createSpaceObject("collectable",candyCount,40f,20f);
-  createSpaceObject("obstacle1",smAsteroidCount,100f,100f);
-  createSpaceObject("obstacle2",medAsteroidCount,80f,120f);
+  createSpaceObject("collectable",candyCount,40f,20f,255,255,255);
+  createSpaceObject("collectable_2",1,40f,20f,50,255,50);
+  createSpaceObject("obstacle1",smAsteroidCount,100f,100f,255,255,255);
+  createSpaceObject("obstacle2",medAsteroidCount,80f,120f,255,255,255);
   
 /**INSERT your picture here simply make the line : customImage = loadImage("myPic.png");**/
-  customImage = null;
+  customImage = loadImage("satellite.png");
   //Number of Custom Objects in game.
-  customObjectCount = 0;
+  customObjectCount = 1;
   //How Wide the object is.
-  float customWidth = 0;
+  float customWidth = 300;
   //How Tall the object is.
-  float customHeight = 0;
+  float customHeight = 200;
   
-  //createSpaceObject("custom_obstacle",customObjectCount,customWidth,customHeight);
+  createSpaceObject("custom_obstacle",customObjectCount,customWidth,customHeight,255,255,255);
   
   
   for(int i = 0; i < stars.length; i++)
-  {
-    stars[i] = new StarField();
+  { 
+    stars[i] = new StarField(); 
   }
 
   //Loading soundfx/music
@@ -730,13 +731,17 @@ void displayGameOverText()
 *they dont immeditely collide with an astroid. 
 */
 
- void createSpaceObject(String tag,int count,float w, float h)
+ void createSpaceObject(String tag,int count,float w, float h, float r, float g, float b)
  {
     PImage im = null;
     float speed = 0;
     switch(tag)
     {
       case "collectable":
+        im = milkyWayCandyCollectable;
+        speed = 12;
+      break;
+       case "collectable_2":
         im = milkyWayCandyCollectable;
         speed = 12;
       break;
@@ -755,12 +760,12 @@ void displayGameOverText()
       case "custom_obstacle":
         im = customImage;
         tag = "obstacle";
-        speed = 0;
+        speed = 10;
       break;
       case "custom_collectable":
         im = customImage;
         tag = "collectable";
-        speed = 0;
+        speed = 10;
         break;
     }
     println(tag);
@@ -771,6 +776,7 @@ void displayGameOverText()
       o.setSpeed(speed);
       o.setGraphicScale(w,h);
       o.setPosition(random(width),random(height,height*2)); 
+      o.setColor(r,g,b);
       spaceObjects.add(o);  
     }
 }
@@ -853,6 +859,16 @@ void handleCollision(SpaceObject o, Rocket r)
               candy2++;
             setLane(o);
           }
+          if(o.getTag()=="collectable_2")
+          {
+            candyCollect.play();
+            flipExistence(true);
+            /*if(collider ==1)
+              candy1++;
+            else if(collider ==2)
+              candy2++;
+            setLane(o);*/
+          }
 }
 
 void displayBackground()
@@ -886,6 +902,33 @@ void displayBackground()
    backPos3.y = height+(height/4);
    imageIndex++;
   }
-  
-  
+}
+
+void flipExistence(boolean upsidedown)
+{
+  if(upsidedown)
+  {
+    for(int i = 0; i < spaceObjects.size(); i++)
+    {
+        SpaceObject o = spaceObjects.get(i);
+        
+        PImage im;
+        float n = random(10);
+        if(n <=3)
+        {
+          im = loadImage("rocket1.png");
+        }
+        else if(n<=6)
+        {
+          im = loadImage("rocket2.png");
+        }
+        else
+        {
+          im = loadImage("rocket3.png");
+        }
+        o.setImage(im);
+        setLane(o);
+    }
+    //playerRocket1
+  }
 }

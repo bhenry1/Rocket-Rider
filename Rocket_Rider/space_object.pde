@@ -7,6 +7,7 @@ class SpaceObject
   CollisionField box;
   float speed = 5;
   boolean offScreen;
+  float r,g,b;
   
   
   SpaceObject(PImage i,CollisionField colField, String obTag)
@@ -17,8 +18,16 @@ class SpaceObject
     box = colField;
     offScreen = false;
     tag = obTag;
-    
+    r=2550;
+    g=255;
+    b=255;
     //new CollisionField(new PVector(40,40),pos);
+  }
+  void setColor(float r, float g, float b)
+  {
+   this.r = r;
+   this.g = g;
+   this.b = b;
   }
   void setPosition(float x,float y)
   {
@@ -49,12 +58,19 @@ class SpaceObject
     */
     
   }
+  
+  void setImage(PImage i)
+  {
+    graphic = i;
+  }
 
   void show()
   {  
     imageMode(CENTER);
     //print("HERE");
+    tint(r,g,b);
     image(graphic, pos.x, pos.y,scale.x,scale.y);
+    tint(255,255,255);
     if(pos.y <0)
     {
      offScreen = true;
