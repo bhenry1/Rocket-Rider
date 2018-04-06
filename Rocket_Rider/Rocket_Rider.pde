@@ -124,11 +124,11 @@ void setup()
   startTimer = new Timer(0);
   rocketFrontImage = loadImage("data/RocketFront.png");
   rocketFrontImage2 = loadImage("data/RocketFront2.png");
-  rocketFrontImage3 = loadImage("data/RocketFront3.png");
+  rocketFrontImage3 = loadImage("data/RocketFront4.png");
   
   rocketRearImage = loadImage("data/RocketRear.png");
   rocketRearImage2 = loadImage("data/RocketRear2.png");
-  rocketRearImage3 = loadImage("data/RocketRear3.png");
+  rocketRearImage3 = loadImage("data/RocketRear4.png");
   
   backPos1 = new PVector(width/2,0);
   backPos2 = new PVector(width/2,height/2);
@@ -188,7 +188,7 @@ void setup()
    //rear_Custom = new RocketFront(thrustSpeed,speedLimit,rearSize);
    
    //ROCKET IS BUILT
-   playerRocket1 = new Rocket(front_TankPoint,rear_StagStag);
+   playerRocket1 = new Rocket(front_TankPoint,rear_BoomBoom);
    playerRocket1.setPosition(pos1.x,pos1.y,0);
    playerRocket1.setColor(255,255,255);
    
@@ -874,9 +874,11 @@ void handleCollision(SpaceObject o, Rocket r)
 void displayBackground()
 {
   imageMode(CENTER);
+  tint(255,100,100);
   image(frame1,backPos1.x,backPos1.y,width,height/2);
   image(frame2,backPos2.x,backPos2.y,width,height/2);
   image(frame3,backPos3.x,backPos3.y,width,height/2);
+  tint(255,255,255);
   backPos1.y-=2;
   backPos2.y-=2;
   backPos3.y-=2;
