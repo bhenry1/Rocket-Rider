@@ -20,6 +20,8 @@ PImage rocketRearImage3;
 PImage gameOverBackGround;
 PImage milkyWayCandyCollectable;
 PImage titleScreenBackground;
+PImage zannyAsteroid;
+PImage ufo;
 
 
 
@@ -67,7 +69,9 @@ ArrayList<SpaceObject> spaceObjects = new ArrayList<SpaceObject>();
 int candyCount;
 int smAsteroidCount;
 int medAsteroidCount;
+int zannyAsteroidCount;
 int customObjectCount;
+int ufoCount;
 
 float speed;
 float timeInterval;
@@ -218,6 +222,8 @@ void setup()
   
   asteroid = loadImage("data/smallAstro.png");
   medAsteroid = loadImage("data/MedAstro.png");
+  zannyAsteroid = loadImage("zannyAsteroid.png");
+  ufo = loadImage("ufo.png");
   spaceBackGround = loadImage("SpaceBackground2.png");
 
   gameOverBackGround = loadImage("GameOverScreen.png");
@@ -253,11 +259,19 @@ void setup()
   candyCount = 5;
   smAsteroidCount = 5;
   medAsteroidCount = 3;
+  zannyAsteroidCount = 1;
+  ufoCount = 2;
   
   createSpaceObject("collectable",candyCount,40f,20f,255,255,255);
   createSpaceObject("collectable_2",1,40f,20f,50,255,50);
   createSpaceObject("obstacle1",smAsteroidCount,100f,100f,255,255,255);
   createSpaceObject("obstacle2",medAsteroidCount,80f,120f,255,255,255);
+  createSpaceObject("obstacle3",zannyAsteroidCount,100f,120f,255,255,255);
+  createSpaceObject("obstacle4",ufoCount,150f,120f,255,255,255);
+
+  
+
+  
   
 /**INSERT your picture here simply make the line : customImage = loadImage("myPic.png");**/
   customImage = loadImage("satellite.png");
@@ -284,6 +298,8 @@ void setup()
 
   
   stage2MusicFile = new SoundFile(this, "DiamondInTheSky.mp3");
+    //stage2MusicFile = new SoundFile(this, "RocketCandy.mp3");
+
   stage2MusicFile.amp(0.3);
   
   crashSound = new SoundFile(this, "Crash.mp3");
@@ -774,6 +790,17 @@ void displayGameOverText()
         im = medAsteroid;
         tag = "obstacle";
         speed = 20;
+      break;
+      //SET ATTRIBUTES OF ZANNY ASTEROID
+       case "obstacle3":
+        im = zannyAsteroid;
+        tag = "obstacle";
+        speed = 7;
+      break;
+       case "obstacle4":
+        im = ufo;
+        tag = "obstacle";
+        speed = 12;
       break;
       case "custom_obstacle":
         im = customImage;
