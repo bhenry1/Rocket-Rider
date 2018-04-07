@@ -47,6 +47,9 @@ boolean right2;
 color tint1;
 color tint2;
 
+boolean flipped;
+int flippedCounter = 200;
+
 Rocket playerRocket1;
 Rocket playerRocket2;
 RocketFront front_Custom;
@@ -119,6 +122,8 @@ void setup()
   
 
   size(600,600);
+  
+  flipped = false;
 
   gameover = false;
   startTimer = new Timer(0);
@@ -340,6 +345,15 @@ void draw()
     //offset.y = playerRocket1.pos.y-x;
     //background(spaceBackGround);
     imageMode(CORNER);
+    if(flipped)
+    {
+       flippedCounter--;
+       if(flippedCounter<=0)
+       {
+          flipped = false;
+          flipExistence(false);
+       }
+    }
     displayBackground();
     //backPos.x = backPos.x+(backPos.z*(offset.x/playerRocket1.pos.z));
     //image(spaceBackGround,-width,0);//,backPos.x,0);
@@ -865,8 +879,12 @@ void handleCollision(SpaceObject o, Rocket r)
           }
           if(o.getTag()=="collectable_2")
           {
-            candyCollect.play();
-            flipExistence(true);
+            
+            if(!flipped)
+            {
+              candyCollect.play();
+              flipExistence(true);
+            }
             /*if(collider ==1)
               candy1++;
             else if(collider ==2)
@@ -910,9 +928,10 @@ void displayBackground()
   }
 }
 
-void flipExistence(boolean upsidedown)
+void flipExistence(boolean upsideDown)
 {
-  if(upsidedown)
+  
+  if(upsideDown)
   {
     for(int i = 0; i < spaceObjects.size(); i++)
     {
@@ -932,9 +951,54 @@ void flipExistence(boolean upsidedown)
         {
           im = loadImage("rocket3.png");
         }
+        if(o.tag=="collectable" || o.tag =="collectable_2")
+        {
+          im = milkyWayCandyCollectable;
+        }
         o.setImage(im);
         setLane(o);
     }
     //playerRocket1
+    flipped = true;
+  }
+  else
+  {
+    for(int i = 0; i < spaceObjects.size(); i++)
+    {
+        SpaceObject o = spaceObjects.get(i);
+        
+        PImage im = null;
+        float n = random(10);
+        switch(o.tag)
+        {
+        case "collectable":
+        im = milkyWayCandyCollectable;
+        break;
+        case "collectable_2":
+        im = milkyWayCandyCollectable;
+        break;
+      //SET ATTRIBUTES OF REGULAR ASTEROID
+        case "obstacle":
+          if(n<=3)
+          {
+            im = customImage;
+          }
+          else if(n<=6)
+          {
+            im = asteroid;
+          }
+          else
+          {
+            im = medAsteroid;
+          }
+   
+         }
+         
+        
+        o.setImage(im);
+        setLane(o);
+    }
+    flipped = false;
+    flippedCounter = 200;
   }
 }
