@@ -110,7 +110,7 @@ int lastLane;
 void setup()
 {
   //RED IS PLAYER 1, BLUE IS PLAYER 2
-  inMultiplayer = true;
+  inMultiplayer = false;
   left1 = false;
   left2 = false;
   right1 = false;

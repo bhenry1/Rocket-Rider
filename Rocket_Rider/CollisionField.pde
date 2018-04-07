@@ -15,7 +15,7 @@ class CollisionField
     stroke(255,0,0);
     noFill();
     rectMode(CENTER);
-    rect(position.x,position.y,dimensions.x,dimensions.y);
+    //rect(position.x,position.y,dimensions.x,dimensions.y);
   }
 
   boolean isCollidingWith(CollisionField other)
